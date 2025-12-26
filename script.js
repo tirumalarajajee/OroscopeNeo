@@ -5,6 +5,7 @@ const LESION_LABELS = [
   "CANDIDIASIS","SPECKLEDLEUKOPLAKIA","SEVERE DYSPLASIA",
   "OSMF","VERRUCOUSLEUKOPLAKIA"
 ];
+const SHOW_MASKS = true; // set false later
 
 let slots = [], tfliteModel = null, csvCache = null, stream = null;
 window.slots = slots;
@@ -321,101 +322,66 @@ async function getCsvDiagnosisFull(){
 
 // ------------------------ Analyze + Predict + Fuse ------------------------
 async function analyzePredictAndFuse() {
-  console.log(window.slots.map((s,i) => ({ i, hasImage: !!s.dataURL, selected: s.selectedEl?.checked, amber: s.amberEl?.checked })));
-  // Gather selected slots
-  const selected = slots.map((s,i)=>({i,sel:s.selectedEl?.checked,url:s.dataURL}))
-                        .filter(x=>x.url && x.sel);
-                        console.log("Slots state:", slots);
-console.log("Selected:", selected);
+  const selected = slots.filter(s => s.dataURL && s.selectedEl?.checked);
 
   if (selected.length !== 2) {
-  alert('Select exactly two images (with checkboxes ticked).');
-  return;
-}
-
-
-  // Amber slot must be exactly one
-  const amber = slots.map((s,i)=>({i,amber:s.amberEl?.checked,url:s.dataURL}))
-                     .filter(x=>x.url && x.amber);
-  if (amber.length !== 1) {
-    alert('Please mark exactly ONE Amber image.');
+    alert("Select exactly two images");
     return;
   }
 
-  // Detect patch type from UI
-  const patchSelected = Array.from(document.querySelectorAll('#patchGroup input'))
-    .filter(cb => cb.checked)
-    .map(cb => (cb.dataset.key||'').toString().trim().toUpperCase());
-  const useWhiteIsolation = patchSelected.includes('WHITE');
+  // Determine patch type
+  const patchSelected = Array.from(
+    document.querySelectorAll('#patchGroup input:checked')
+  ).map(cb => cb.dataset.key);
 
-  // Get imageData for both selected images
-  const idA = await getImageDataFromDataUrlResized(selected[0].url, ANALYSIS_MAX_DIM);
-  const idB = await getImageDataFromDataUrlResized(selected[1].url, ANALYSIS_MAX_DIM);
+  const payload = {
+    imgA: selected[0].dataURL,
+    imgB: selected[1].dataURL,
+    patchType: patchSelected.includes("WHITE") ? "WHITE" : "RED",
+    ddKey: ddnewfinaltxt()
+  };
 
-  // Convert to BW first
-  const bwA = convertToBlackAndWhite(idA);
-  const bwB = convertToBlackAndWhite(idB);
+  // 🔗 CLOUD FUNCTION URL (USE YOUR a.run.app URL)
+  const FUNCTION_URL = "https://analyze-pg3snxql4q-uc.a.run.app";
+  
 
-  // Apply isolation
-  const maskA = useWhiteIsolation ? isolationWhite(bwA) : changeRedcolor(bwA);
-  const maskB = useWhiteIsolation ? isolationWhite(bwB) : changeRedcolor(bwB);
-
-  // Counts
-  const countA = getCount(maskA);
-  const countB = getCount(maskB);
-
-  // Percent variation
-  const denom = Math.max(countA, countB, 1);
-  const percents = (Math.abs(countA - countB) / denom) * 100;
-
-  // TFLite predictions
-  let predA = '', predB = '', predText = '';
+  let result;
   try {
-    predA = await runTFLitePredictionOnImageData(idA);
-    predB = await runTFLitePredictionOnImageData(idB);
-    predText = predA === predB ? (predA || 'N/A') : `${predA || 'N/A'} | ${predB || 'N/A'}`;
-  } catch(e) {
-    console.warn('TFLite prediction failed', e);
-    predText = 'N/A';
+    const res = await fetch(FUNCTION_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      throw new Error("Server error: " + res.status);
+    }
+
+    result = await res.json();
+    if (SHOW_MASKS) {
+  if (result.bwA_png) setSlotImage(6, result.bwA_png);
+  if (result.bwB_png) setSlotImage(7, result.bwB_png);
+  if (result.maskA_png) setSlotImage(8, result.maskA_png);
+  if (result.maskB_png) setSlotImage(9, result.maskB_png);
+}
+
+
+  } catch (err) {
+    console.error(err);
+    alert("Analysis failed: " + err.message);
+    return;
   }
 
-  // Push mask previews
-  try{ putMaskPreviewInSlot(8, maskA, countA); }catch(e){ console.warn('slot9 failed', e); }
-  try{ putMaskPreviewInSlot(9, maskB, countB); }catch(e){ console.warn('slot10 failed', e); }
-  try{ putMaskPreviewInSlot(6, bwA, countA); }catch(e){ console.warn('slot7 failed', e); }
-  try{ putMaskPreviewInSlot(7, bwB, countB); }catch(e){ console.warn('slot8 failed', e); }
-
-  // CSV diagnosis
-  const csvResult = await getCsvDiagnosisFull();
-  const csvText = (csvResult.provisional || csvResult.differential || csvResult.advice)
-    ? `Provisional: ${csvResult.provisional}\nDifferential: ${csvResult.differential}\nAdvice: ${csvResult.advice}`
-    : 'No CSV match found';
-  $('provDiag').value = csvResult.provisional  || '';
-  $('diffDiag').value = csvResult.differential || '';
-  $('advise').value = csvResult.advice || '';
-
-  // Status
-  $('status').textContent = `Mask counts → Img1: ${countA}, Img2: ${countB}`;
-
-  // Conclusion bands
-  let resultText = '';
-  if (percents < 120) {
-    resultText = 'Variable Diagnosis, observe two weeks.';
-  } else if (percents <= 124) {
-    resultText = 'Borderline Dysplasia ? refer to a specialist.';
-  } else {
-    resultText = 'Suggestive of Dysplasia refer to a specialist.';
-  }
-
-  // Final analysis output
+  // ---------------- Display results ----------------
   $('analysis').textContent =
-    `Img1 G-sum: ${countA}\n` +
-    `Img2 G-sum: ${countB}\n` +
-    `Variation%: ${percents.toFixed(2)}%\n` +
-    `TFLite: ${predText}\n\n` +
-    `Condensed Key: ${ddnewfinaltxt()}\n\n` + 
-    `${csvText}\n\n` +
-    `Conclusion: ${resultText}`;
+    `Img1 G-count: ${result.countA}\n` +
+    `Img2 G-count: ${result.countB}\n` +
+    `Variation: ${result.percent}%\n\n` +
+    `Conclusion: ${result.conclusion}`;
+
+  $('provDiag').value = result.provisional || "";
+  $('diffDiag').value = result.differential || "";
+  $('advise').value = result.advice || "";
 }
 
 
