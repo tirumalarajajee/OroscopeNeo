@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Oral Exam — Cases</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Oral Exam — Cases</h1>
+
+    <div id="authArea" class="auth">
+      <div id="userInfo" class="small info">Not signed in</div>
+      <div id="authControls">
+        <input id="authEmail" type="text" placeholder="email" class="auth-input">
+        <input id="authPass" type="password" placeholder="password" class="auth-input">
+        <button id="signUpBtn" class="btn btn-ghost">Sign Up</button>
+        <button id="signInBtn" class="btn btn-primary">Sign In</button>
+        <button id="signOutBtn" class="btn btn-ghost" style="display:none">Sign Out</button>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:12px; gap:8px;">
+      <button id="addCaseBtn" class="btn btn-primary">+ Add New Case</button>
+      <input id="searchInput" placeholder="Search name / case id / case number / diagnosis" style="flex:1; padding:8px; border-radius:6px; border:1px solid #ddd;">
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:10px;">
+      <select id="filterGender">
+        <option value="">All genders</option>
+        <option value="M">Male</option>
+        <option value="F">Female</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <select id="sortBy">
+        <option value="date_desc">Date (new → old)</option>
+        <option value="date_asc">Date (old → new)</option>
+        <option value="name_asc">Name A→Z</option>
+        <option value="caseid_asc">CaseId A→Z</option>
+      </select>
+
+    </div>
+
+    <h2 style="margin-top:12px">Your cases</h2>
+    <div id="casesList" class="cases-list">
+      <div class="small">Not signed in</div>
+    </div>
+
+    <div class="note small info" style="margin-top:16px">
+      <strong>Note:</strong> You must enable Email/Password Auth in Firebase console. Rules are included in the ZIP.
+    </div>
+  </div>
+
+<!-- Firebase Core -->
+
+
+
+<!-- Your Firebase Config -->
+<script type="module" src="./firebase.js"></script>
+<script type="module" src="script_home.js"></script>
+
+
+<!-- Optional -->
+<script src="./libs/html2pdf.bundle.min.js"></script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Case Profile</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+  <div class="container">
+    <h1>Case Profile</h1>
+    <div class="row actions">
+     
+    </div>
+    <div id="casesList" style="margin-top:12px"></div>
+  </div>
+
+
+<script type="module">
+import { db } from './firebase.js';
+import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+function $(id){ return document.getElementById(id); }
+
+$('newCase').addEventListener('click', ()=>location.href='index.html');
+
+async function loadCases(){
+  const list = $('casesList');
+  list.innerHTML = 'Loading...';
+  try {
+    const q = query(collection(db, 'cases'), orderBy('timestamp','desc'));
+    const snap = await getDocs(q);
+    if(snap.empty){ list.innerHTML='<div class="small">No cases</div>'; return; }
+    const rows = [];
+    snap.forEach(doc=>{
+      const d=doc.data();
+      rows.push(`<div class="info" style="margin-bottom:8px;padding:8px">
+        <strong>${d.name||'--'}</strong> — ${d.caseNumber||'--'}<br/>
+        Age: ${d.age||'--'} | Gender: ${d.gender||'--'}<br/>
+        Provisional: ${d.provisionalDiagnosis||''}<br/>
+        <button onclick="viewCase('${doc.id}')" class="btn btn-ghost">View / Edit</button>
+      </div>`);
+    });
+    list.innerHTML = rows.join('\\n');
+  } catch(e){
+    list.innerHTML = 'Error loading';
+    console.error(e);
+  }
+}
+window.viewCase = function(id){ location.href = 'index.html?id=' + encodeURIComponent(id); }
+loadCases();
+</script>
+</body>
+
+
+
+    
+
+   <div class="layout">
+  <div class="main">
+    <div class="grid cols-2">
+      <div><label>Name</label><input id="name" type="text" placeholder="Patient name"></div>
+      <div><label>Case Number</label><input id="caseNumber" type="text" placeholder="Case #"></div>
+      <div><label>Case ID</label><input id="caseId" type="text" placeholder="Unique case ID"></div>
+      <div><label>Age</label><input id="age" type="number" placeholder="Age"></div>
+      <div><label>Gender</label><input id="gender" type="text" placeholder="M / F / Other"></div>
+      <div><label>Patient ID</label><input id="pid" type="text" placeholder="Patient ID"></div>
+      <div><label>General Health</label><input id="generalHealth" type="text" placeholder="General health notes"></div>
+      <label><input type="checkbox" id="debugToggle"> Show debug overlay</label>
+      
+
+      <!-- Duration removed from here -->
+    </div>
+
+    <hr>
+
+    <h3>ULCER</h3>
+    <div class="checkbox-row" id="ulcerGroup">
+      <label><input type="checkbox" data-key="Ulcerround"> Round</label>
+      <label><input type="checkbox" data-key="IrregularL1L2"> Irregular &lt;1cm &lt;2 weeks</label>
+      <label><input type="checkbox" data-key="IrregularM1L2"> Irregular &gt;1cm &lt;2 weeks</label>
+      <label><input type="checkbox" data-key="IrregularL1M2"> Irregular &lt;1cm &gt;2 weeks</label>
+      <label><input type="checkbox" data-key="IrregularM1M2"> Irregular &gt;1cm &gt;2 weeks</label>
+      <label><input type="checkbox" data-key="UNAD"> NAD</label>
+
+    </div>
+
+    <!-- Duration moved here -->
+    <div>
+      <label>Duration (since)</label>
+      <input id="duration" type="text" placeholder="no. of days/weeks/months/years">
+    </div>
+
+    <h3>Patch</h3>
+    <div class="checkbox-row" id="patchGroup">
+      <label><input type="checkbox" data-key="Red"> Red Patch</label>
+      <label><input type="checkbox" data-key="White"> White Patch</label>
+      <label><input type="checkbox" data-key="Redwhite"> Red & White Patch</label>
+      <label><input type="checkbox" data-key="Redwhitelines"> Red Patch with white lines</label>
+      <label><input type="checkbox" data-key="PNAD"> NAD</label>
+    </div>
+
+ <h3>Growth</h3>
+    <div class="checkbox-row" id="growthGroup">
+      <label><input type="checkbox" data-key="round"> Round</label>
+      <label><input type="checkbox" data-key="IrregularL1"> Irregular &lt;1cm</label>
+      <label><input type="checkbox" data-key="IrregularM1"> Irregular &gt;1cm</label>
+      <label><input type="checkbox" data-key="GNAD"> NAD</label>
+    </div>
+<h3>Mucosal Texture</h3>
+        <div class="checkbox-row" id="mucosaGroup">
+          <label><input type="checkbox" data-key="Marblewhite"> Marble-white / Palpable bands / Rubbery mucosa</label>
+          <label><input type="checkbox" data-key="MNAD"> NAD</label>
+        </div>
+
+
+        <h3>Pigmentation</h3>
+        <div class="checkbox-row" id="pigmentationGroup">
+          <label><input type="checkbox" data-key="Dark"> Dark Pigmentation</label>
+          <label><input type="checkbox" data-key="PiNAD"> NAD</label>
+        </div>
+
+        
+
+        <h3>Symptoms</h3>
+        <div class="checkbox-row" id="symptomGroup">
+          <label><input type="checkbox" data-key="Pain"> Pain</label>
+          <label><input type="checkbox" data-key="Redness"> Redness</label>
+          <label><input type="checkbox" data-key="Swelling"> Swelling</label>
+          <label><input type="checkbox" data-key="Burning"> Burning sensation</label>
+          <label><input type="checkbox" data-key="Mouth"> Unable to open mouth</label>
+          <label><input type="checkbox" data-key="Blanching"> Blanching / Diascopy</label>
+          <label><input type="checkbox" data-key="No"> No Symptoms</label>
+        </div>
+
+        <h3>Habits</h3>
+        <div class="checkbox-row" id="habitGroup">
+          <label><input type="checkbox" data-key="Smoking"> Smoking</label>
+          <label><input type="checkbox" data-key="Alcohol"> Alcohol</label>
+          <label><input type="checkbox" data-key="Panchew"> Pan chewing</label>
+          <label><input type="checkbox" data-key="Tobacco"> Tobacco chewing</label>
+          <label><input type="checkbox" data-key="Spices"> Spices</label>
+          <label><input type="checkbox" data-key="Hno"> No habits</label>
+        </div>
+
+        <h3>Teeth</h3>
+        <div class="checkbox-row" id="teethGroup">
+          <label><input type="checkbox" data-key="Sharp"> Sharp teeth</label>
+          <label><input type="checkbox" data-key="SNO"> No</label>
+        </div>
+
+       
+      <h3>History of Present Illness</h3>
+    <div class="checkbox-row" id="illnessGroup">
+      <label><input type="checkbox" data-key="histYes"> Yes</label>
+      <label><input type="checkbox" data-key="histNo"> No</label>
+    </div>
+    <label>Your description of previous visit</label>
+    <textarea id="prevVisit" rows="3" placeholder="your description of previous visit"></textarea>
+
+
+
+
+    <!-- 🔽 Oral Mapping moved here -->
+    <div class="mapping-wrap" style="position:relative; display:inline-block;">
+  <img id="mapImage" class="mapping-img" src="assets/oralcavitycolornew3.jpg" alt="oral mapping" style="display:block; max-width:100%;">
+  <canvas id="mapCanvas" class="mapping-canvas" style="position:absolute; left:0; top:0;"></canvas>
+</div>
+
+<label>Lesion Location</label>
+<input id="lesionLocation" type="text" placeholder="Selected regions will appear here">
+
+    <!-- 🔽 Camera moved here -->
+    <hr>
+    <h3>Camera & Capture</h3>
+    <div class="row">
+      <select id="cameraSelect"></select>
+      <button id="refreshCams" class="btn btn-ghost">Refresh</button>
+    </div>
+    <video id="cameraPreview" class="camera-video" autoplay muted playsinline></video>
+    <div class="row">
+      <button id="startCam" class="btn btn-primary">Start</button>
+      <button id="stopCam" class="btn btn-ghost">Stop</button>
+    </div>
+
+  </div> <!-- end .main -->
+    </div>
+
+    <hr>
+
+    <h3>Image Slots (10)</h3>
+    <div id="slotsContainer" class="slot-grid">
+<div class="slot">
+  <div style="display:flex;justify-content:space-between">
+    <strong>View 1</strong>
+    <label><input type="checkbox" id="slot-select-0"> Select</label>
+    <label><input type="checkbox" id="slot-amber-0"> Amber</label>
+  </div>
+   <div class="preview">
+    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
+    <div class="small">No image</div>
+  </div>
+  <input type="file" accept="image/*">
+  <div style="display:flex;gap:6px">
+    <button class="btn btn-ghost">Capture</button>
+    <button class="btn btn-ghost">Remove</button>
+  </div>
+</div>
+<div class="slot">
+  <div style="display:flex;justify-content:space-between">
+    <strong>View 2</strong>
+    <label><input type="checkbox" id="slot-select-1"> Select</label>
+    <label><input type="checkbox" id="slot-amber-1"> Amber</label>
+  </div>
+   <div class="preview">
+    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
+    <div class="small">No image</div>
+  </div>
+  <input type="file" accept="image/*">
+  <div style="display:flex;gap:6px">
+    <button class="btn btn-ghost">Capture</button>
+    <button class="btn btn-ghost">Remove</button>
+  </div>
+</div>
+<div class="slot">
+  <div style="display:flex;justify-content:space-between">
+    <strong>View 3</strong>
+    <label><input type="checkbox" id="slot-select-2"> Select</label>
+    <label><input type="checkbox" id="slot-amber-2"> Amber</label>
+  </div>
+  <div class="preview">
+    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
+    <div class="small">No image</div>
+  </div>
+  <input type="file" accept="image/*">
+  <div style="display:flex;gap:6px">
+    <button class="btn btn-ghost">Capture</button>
+    <button class="btn btn-ghost">Remove</button>
+  </div>
+</div>
+<div class="slot">
+  <div style="display:flex;justify-content:space-between">
+    <strong>View 4</strong>
+    <label><input type="checkbox" id="slot-select-3"> Select</label>
+    <label><input type="checkbox" id="slot-amber-3"> Amber</label>
+  </div>
+   <div class="preview">
+    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
+    <div class="small">No image</div>
+  </div>
+  <input type="file" accept="image/*">
+  <div style="display:flex;gap:6px">
+    <button class="btn btn-ghost">Capture</button>
+    <button class="btn btn-ghost">Remove</button>
+  </div>
+</div>
+<div class="slot">
+  <div style="display:flex;justify-content:space-between">
+    <strong>View 5</strong>
+    <label><input type="checkbox" id="slot-select-4"> Select</label>
+    <label><input type="checkbox" id="slot-amber-4"> Amber</label>
+  </div>
+   <div class="preview">
+    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
+    <div class="small">No image</div>
+  </div>
+  <input type="file" accept="image/*">
+  <div style="display:flex;gap:6px">
+    <button class="btn btn-ghost">Capture</button>
+    <button class="btn btn-ghost">Remove</button>
+  </div>
+</div>
+<div class="slot">
+  <div style="display:flex;justify-content:space-between">
+    <strong>View 6</strong>
+    <label><input type="checkbox" id="slot-select-5"> Select</label>
+    <label><input type="checkbox" id="slot-amber-5"> Amber</label>
+  </div>
+  <div class="preview">
+    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
+    <div class="small">No image</div>
+  </div>
+  <input type="file" accept="image/*">
+  <div style="display:flex;gap:6px">
+    <button class="btn btn-ghost">Capture</button>
+    <button class="btn btn-ghost">Remove</button>
+  </div>
+</div>
+<div class="slot">
+  <div style="display:flex;justify-content:space-between">
+    <strong>View 7</strong>
+    <label><input type="checkbox" id="slot-select-6"> Select</label>
+    <label><input type="checkbox" id="slot-amber-6"> Amber</label>
+  </div>
+   <div class="preview">
+    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
+    <div class="small">No image</div>
+  </div>
+  <input type="file" accept="image/*">
+  <div style="display:flex;gap:6px">
+    <button class="btn btn-ghost">Capture</button>
+    <button class="btn btn-ghost">Remove</button>
+  </div>
+</div>
+<div class="slot">
+  <div style="display:flex;justify-content:space-between">
+    <strong>View 8</strong>
+    <label><input type="checkbox" id="slot-select-7"> Select</label>
+    <label><input type="checkbox" id="slot-amber-7"> Amber</label>
+  </div>
+  <div class="preview">
+    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
+    <div class="small">No image</div>
+  </div>
+  <input type="file" accept="image/*">
+  <div style="display:flex;gap:6px">
+    <button class="btn btn-ghost">Capture</button>
+    <button class="btn btn-ghost">Remove</button>
+  </div>
+</div>
+<div class="slot">
+  <div style="display:flex;justify-content:space-between">
+    <strong>View 9</strong>
+    <label><input type="checkbox" id="slot-select-8"> Select</label>
+    <label><input type="checkbox" id="slot-amber-8"> Amber</label>
+  </div>
+  <div class="preview">
+    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
+    <div class="small">No image</div>
+  </div>
+  <input type="file" accept="image/*">
+  <div style="display:flex;gap:6px">
+    <button class="btn btn-ghost">Capture</button>
+    <button class="btn btn-ghost">Remove</button>
+  </div>
+</div>
+<div class="slot">
+  <div style="display:flex;justify-content:space-between">
+    <strong>View 10</strong>
+    <label><input type="checkbox" id="slot-select-9"> Select</label>
+    <label><input type="checkbox" id="slot-amber-9"> Amber</label>
+  </div>
+ <div class="preview">
+    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
+    <div class="small">No image</div>
+  </div>
+  <input type="file" accept="image/*">
+  <div style="display:flex;gap:6px">
+    <button class="btn btn-ghost">Capture</button>
+    <button class="btn btn-ghost">Remove</button>
+  </div>
+</div>
+
+
+
+
+
+</div>
+
+    <div>
+      <h3>Image Analysis</h3>
+      <pre id="analysis">No analysis yet.</pre>
+    </div>
+
+    <div class="grid cols-3 diag-grid">
+      <div>
+        <label>Provisional Diagnosis</label>
+        <textarea id="provDiag" rows="3"></textarea>
+      </div>
+      <div>
+        <label>Differential Diagnosis</label>
+        <textarea id="diffDiag" rows="3"></textarea>
+      </div>
+      <div>
+        <label>Advise</label>
+        <textarea id="advise" rows="3"></textarea>
+      </div>
+    </div>
+
+   <div class="row actions">
+  <button id="analyzeBtn" class="btn btn-primary">Analyze Selected Images</button>
+  <!-- New Image Analysis button -->
+ 
+  <button id="saveBtn" class="btn btn-primary">Save (Auth required)</button>
+  <button id="clearBtn" class="btn btn-ghost">Reset Form</button>
+  <div class="status small" id="status"></div>
+</div>
+
+
+    <div class="note small info">
+      <strong>Security note:</strong> Configure Firebase Storage & Firestore rules to require authentication (request.auth != null).
+    </div>
+  </div>
+
+<!-- TensorFlow -->
+
+
+<!-- html2pdf -->
+
+
+<!-- App modules -->
+<script type="module" src="firebase.js"></script>
+<script type="module" src="script.js"></script>
+<script type="module" src="script_case.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+[
+  {
+    "origin": [
+      "http://localhost:8000",
+      "http://localhost:3000",
+      "https://*.vercel.app",
+      "https://*.github.io"
+    ],
+    "method": ["GET", "POST", "PUT", "DELETE"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": ["Content-Type", "Authorization"]
+  }
+]
