@@ -52,62 +52,7 @@ function imageDataToDataUrl(imageData){
   return c.toDataURL('image/png');
 }
 
-// ------------------------ Algorithms ------------------------
-function convertToBlackAndWhite(imageData){
-  const w = imageData.width, h = imageData.height;
-  const out = new ImageData(w, h);
-  for(let i = 0; i < imageData.data.length; i += 4){
-    const r = imageData.data[i], g = imageData.data[i+1], b = imageData.data[i+2];
-    const y = 0.299*r + 0.587*g + 0.114*b;
-    out.data[i] = out.data[i+1] = out.data[i+2] = y; out.data[i+3] = 255;
-  }
-  return out;
-}
 
-function changeRedcolor(imageData){
-  const out = new ImageData(imageData.width, imageData.height);
-  const debugMode = q('#debugToggle')?.checked;
-  for(let i = 0; i < imageData.data.length; i += 4){
-    const r = imageData.data[i], g = imageData.data[i+1], b = imageData.data[i+2];
-    const gray = 0.299*r + 0.587*g + 0.114*b;
-    const isDark = gray < 100; // simulate valMask3 dark mask
-    if(isDark){
-      // dark → green (to count)
-      out.data[i] = 0; out.data[i+1] = 255; out.data[i+2] = 0; out.data[i+3] = 255;
-    } else {
-      // keep original
-      out.data[i] = r; out.data[i+1] = g; out.data[i+2] = b; out.data[i+3] = 255;
-    }
-  }
-  return out;
-}
-
-function isolationWhite(imageData){
-  const out = new ImageData(imageData.width, imageData.height);
-  for(let i = 0; i < imageData.data.length; i += 4){
-    const r = imageData.data[i], g = imageData.data[i+1], b = imageData.data[i+2];
-    const gray = 0.299*r + 0.587*g + 0.114*b;
-    const isWhiteRange = gray >= 75 && gray <= 179;
-    if(isWhiteRange){
-      out.data[i] = r; out.data[i+1] = g; out.data[i+2] = b; out.data[i+3] = 255;
-    } else {
-      out.data[i] = 0; out.data[i+1] = 255; out.data[i+2] = 0; out.data[i+3] = 255;
-    }
-  }
-  return out;
-}
-
-// Count only pure green pixels
-function getCount(imageData){
-  let greenCount = 0;
-  for(let i = 0; i < imageData.data.length; i += 4){
-    const r = imageData.data[i], g = imageData.data[i+1], b = imageData.data[i+2];
-    if(r === 0 && g === 255 && b === 0){
-      greenCount += g;
-    }
-  }
-  return greenCount;
-}
 
 // ------------------------ Slots UI ------------------------
 function initSlots() {
