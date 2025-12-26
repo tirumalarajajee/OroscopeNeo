@@ -249,14 +249,24 @@ function safeCsvSplit(line){
 }
 
 async function loadCsv(){
-  if(csvCache) return csvCache;
-  try{
-    const res = await fetch('assets/finalDDoroscope3825new.csv');
+  if (csvCache) return csvCache;
+  try {
+    const res = await fetch(
+      'https://raw.githubusercontent.com/tirumalarajajee/OroscopeNeo/main/finalDDoroscope3825new.csv'
+    );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
     const txt = await res.text();
     const rows = txt.trim().split(/\r?\n/).map(safeCsvSplit);
-    csvCache = rows; return rows;
-  }catch(e){ console.warn('CSV load error', e); csvCache = []; return []; }
+    csvCache = rows;
+    return rows;
+  } catch (e) {
+    console.warn('CSV load error', e);
+    csvCache = [];
+    return [];
+  }
 }
+
 
 async function loadTflite(){
   try{
