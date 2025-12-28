@@ -5,6 +5,7 @@ import {
   db,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   signOut
 } from "./firebase.js";
 
