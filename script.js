@@ -275,11 +275,16 @@ async function analyzePredictAndFuse() {
   }
 
   // Determine patch type
-  const patchSelected = Array.from(
-    document.querySelectorAll('#patchGroup input:checked')
-  ).map(cb => cb.dataset.key);
+ 
 
-  const payload = {
+  const patchKeys = getCheckedKeys("patchGroup");
+
+const patchType =
+  patchKeys.some(k => k.toLowerCase().includes("white"))
+    ? "WHITE"
+    : "RED";
+
+const payload = {
   imgA: selected[0].dataURL,
   imgB: selected[1].dataURL,
   patchType,
@@ -297,6 +302,7 @@ async function analyzePredictAndFuse() {
     "Oral Mapping": document.getElementById("lesionLocation").value || ""
   }
 };
+
 
 
   // 🔗 CLOUD FUNCTION URL (USE YOUR a.run.app URL)
