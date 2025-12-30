@@ -280,11 +280,24 @@ async function analyzePredictAndFuse() {
   ).map(cb => cb.dataset.key);
 
   const payload = {
-    imgA: selected[0].dataURL,
-    imgB: selected[1].dataURL,
-    patchType: patchSelected.includes("WHITE") ? "WHITE" : "RED",
-    ddKey: ddnewfinaltxt()
-  };
+  imgA: selected[0].dataURL,
+  imgB: selected[1].dataURL,
+  patchType,
+
+  rules: {
+    "Ulcer": getCheckedKey("ulcerGroup"),
+    "Patch": getCheckedKey("patchGroup"),
+    "Growth": getCheckedKey("growthGroup"),
+    "Mucosal Condition": getCheckedKey("mucosaGroup"),
+    "Pigmentation": getCheckedKey("pigmentationGroup"),
+    "Sharp Objects": getCheckedKey("teethGroup"),
+
+    "Symptoms": getCheckedKeys("symptomGroup").join(";"),
+    "Habits": getCheckedKeys("habitGroup").join(";"),
+    "Oral Mapping": document.getElementById("lesionLocation").value || ""
+  }
+};
+
 
   // 🔗 CLOUD FUNCTION URL (USE YOUR a.run.app URL)
   const FUNCTION_URL = "https://analyze-pg3snxql4q-uc.a.run.app";
