@@ -22,7 +22,13 @@ import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/fir
 
 function $(id){ return document.getElementById(id); }
 
-$('newCase').addEventListener('click', ()=>location.href='index.html');
+const newCaseBtn = $('newCase');
+if (newCaseBtn) {
+  newCaseBtn.addEventListener('click', () => {
+    location.href = 'index.html';
+  });
+}
+
 
 async function loadCases(){
   const list = $('casesList');
