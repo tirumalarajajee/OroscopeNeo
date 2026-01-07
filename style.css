@@ -41,3 +41,18 @@ input[type=text], input[type=number], input[type=password], textarea, select{wid
 .case-card button {
   margin-right: 8px;
 }
+<style>
+.prediction-overlay{
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0,0,0,0.7);
+  color: #00ff88;
+  padding: 6px 10px;
+  font-weight: bold;
+  font-size: 14px;
+  z-index: 9999;
+}
+</style>
+
+

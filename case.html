@@ -22,13 +22,7 @@ import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/fir
 
 function $(id){ return document.getElementById(id); }
 
-const newCaseBtn = $('newCase');
-if (newCaseBtn) {
-  newCaseBtn.addEventListener('click', () => {
-    location.href = 'index.html';
-  });
-}
-
+$('newCase').addEventListener('click', ()=>location.href='index.html');
 
 async function loadCases(){
   const list = $('casesList');
@@ -80,16 +74,16 @@ loadCases();
 
     <hr>
 
-       <h3>ULCER</h3>
-<div class="checkbox-row" id="ulcerGroup">
-  <label><input type="checkbox" data-key="Round Ulcer"> Round Ulcer</label>
-  <label><input type="checkbox" data-key="Irregular <1cm, <2 Weeks"> Irregular &lt;1cm &lt;2 Weeks</label>
-  <label><input type="checkbox" data-key="Irregular <1cm, >2 Weeks"> Irregular &lt;1cm &gt;2 Weeks</label>
-  <label><input type="checkbox" data-key="Irregular >1cm, <2 Weeks"> Irregular &gt;1cm &lt;2 Weeks</label>
-  <label><input type="checkbox" data-key="Irregular >1cm, >2 Weeks"> Irregular &gt;1cm &gt;2 Weeks</label>
-  <label><input type="checkbox" data-key="No Abnormality Detected"> NAD</label>
-</div>
+    <h3>ULCER</h3>
+    <div class="checkbox-row" id="ulcerGroup">
+      <label><input type="checkbox" data-key="Ulcerround"> Round</label>
+      <label><input type="checkbox" data-key="IrregularL1L2"> Irregular &lt;1cm &lt;2 weeks</label>
+      <label><input type="checkbox" data-key="IrregularM1L2"> Irregular &gt;1cm &lt;2 weeks</label>
+      <label><input type="checkbox" data-key="IrregularL1M2"> Irregular &lt;1cm &gt;2 weeks</label>
+      <label><input type="checkbox" data-key="IrregularM1M2"> Irregular &gt;1cm &gt;2 weeks</label>
+      <label><input type="checkbox" data-key="UNAD"> NAD</label>
 
+    </div>
 
     <!-- Duration moved here -->
     <div>
@@ -98,69 +92,62 @@ loadCases();
     </div>
 
     <h3>Patch</h3>
-<div class="checkbox-row" id="patchGroup">
-  <label><input type="checkbox" data-key="Red Patch"> Red Patch</label>
-  <label><input type="checkbox" data-key="White Patch"> White Patch</label>
-  <label><input type="checkbox" data-key="Red & White Patch"> Red & White Patch</label>
-  <label><input type="checkbox" data-key="Red patch with whitelines"> Red patch with white lines</label>
-  <label><input type="checkbox" data-key="No Abnormality Detected"> NAD</label>
-</div>
-
+    <div class="checkbox-row" id="patchGroup">
+      <label><input type="checkbox" data-key="Red"> Red Patch</label>
+      <label><input type="checkbox" data-key="White"> White Patch</label>
+      <label><input type="checkbox" data-key="Redwhite"> Red & White Patch</label>
+      <label><input type="checkbox" data-key="Redwhitelines"> Red Patch with white lines</label>
+      <label><input type="checkbox" data-key="PNAD"> NAD</label>
+    </div>
 
  <h3>Growth</h3>
-<div class="checkbox-row" id="growthGroup">
-  <label><input type="checkbox" data-key="Round Growth"> Round Growth</label>
-  <label><input type="checkbox" data-key="Irregular Growth <1cm"> Irregular &lt;1cm</label>
-  <label><input type="checkbox" data-key="Irregular Growth >1cm"> Irregular &gt;1cm</label>
-  <label><input type="checkbox" data-key="No Abnormality Detected"> NAD</label>
-</div>
-
-<h3>Mucosal Condition</h3>
-<div class="checkbox-row" id="mucosaGroup">
-  <label><input type="checkbox" data-key="Marble Appearance"> Marble Appearance</label>
-  <label><input type="checkbox" data-key="No Abnormality Detected"> NAD</label>
-</div>
-
+    <div class="checkbox-row" id="growthGroup">
+      <label><input type="checkbox" data-key="round"> Round</label>
+      <label><input type="checkbox" data-key="IrregularL1"> Irregular &lt;1cm</label>
+      <label><input type="checkbox" data-key="IrregularM1"> Irregular &gt;1cm</label>
+      <label><input type="checkbox" data-key="GNAD"> NAD</label>
+    </div>
+<h3>Mucosal Texture</h3>
+        <div class="checkbox-row" id="mucosaGroup">
+          <label><input type="checkbox" data-key="Marblewhite"> Marble-white / Palpable bands / Rubbery mucosa</label>
+          <label><input type="checkbox" data-key="MNAD"> NAD</label>
+        </div>
 
 
         <h3>Pigmentation</h3>
-<div class="checkbox-row" id="pigmentationGroup">
-  <label><input type="checkbox" data-key="Dark Pigmentation"> Dark Pigmentation</label>
-  <label><input type="checkbox" data-key="No Abnormality Detected"> NAD</label>
-</div>
-
+        <div class="checkbox-row" id="pigmentationGroup">
+          <label><input type="checkbox" data-key="Dark"> Dark Pigmentation</label>
+          <label><input type="checkbox" data-key="PiNAD"> NAD</label>
+        </div>
 
         
 
         <h3>Symptoms</h3>
-<div class="checkbox-row" id="symptomGroup">
-  <label><input type="checkbox" data-key="Pain"> Pain</label>
-  <label><input type="checkbox" data-key="Redness"> Redness</label>
-  <label><input type="checkbox" data-key="Swelling"> Swelling</label>
-  <label><input type="checkbox" data-key="Burning"> Burning</label>
-  <label><input type="checkbox" data-key="Difficulty in Eating"> Difficulty in Eating</label>
-  <label><input type="checkbox" data-key="Blanching"> Blanching</label>
-  <label><input type="checkbox" data-key="No Symptoms"> No Symptoms</label>
-</div>
-
+        <div class="checkbox-row" id="symptomGroup">
+          <label><input type="checkbox" data-key="Pain"> Pain</label>
+          <label><input type="checkbox" data-key="Redness"> Redness</label>
+          <label><input type="checkbox" data-key="Swelling"> Swelling</label>
+          <label><input type="checkbox" data-key="Burning"> Burning sensation</label>
+          <label><input type="checkbox" data-key="Mouth"> Unable to open mouth</label>
+          <label><input type="checkbox" data-key="Blanching"> Blanching / Diascopy</label>
+          <label><input type="checkbox" data-key="No"> No Symptoms</label>
+        </div>
 
         <h3>Habits</h3>
-<div class="checkbox-row" id="habitGroup">
-  <label><input type="checkbox" data-key="Multiple habits"> Multiple habits</label>
-  <label><input type="checkbox" data-key="Smoking"> Smoking</label>
-  <label><input type="checkbox" data-key="Alcohol"> Alcohol</label>
-  <label><input type="checkbox" data-key="Pan Chewing"> Pan Chewing</label>
-  <label><input type="checkbox" data-key="Tobacco Chewing"> Tobacco Chewing</label>
-  <label><input type="checkbox" data-key="Spicy Foods"> Spicy Foods</label>
-  <label><input type="checkbox" data-key="No Habits"> No Habits</label>
-</div>
+        <div class="checkbox-row" id="habitGroup">
+          <label><input type="checkbox" data-key="Smoking"> Smoking</label>
+          <label><input type="checkbox" data-key="Alcohol"> Alcohol</label>
+          <label><input type="checkbox" data-key="Panchew"> Pan chewing</label>
+          <label><input type="checkbox" data-key="Tobacco"> Tobacco chewing</label>
+          <label><input type="checkbox" data-key="Spices"> Spices</label>
+          <label><input type="checkbox" data-key="Hno"> No habits</label>
+        </div>
 
-
-       <h3>Sharp Objects</h3>
-<div class="checkbox-row" id="teethGroup">
-  <label><input type="checkbox" data-key="Detected"> Detected</label>
-  <label><input type="checkbox" data-key="Not detected"> Not detected</label>
-</div>
+        <h3>Teeth</h3>
+        <div class="checkbox-row" id="teethGroup">
+          <label><input type="checkbox" data-key="Sharp"> Sharp teeth</label>
+          <label><input type="checkbox" data-key="SNO"> No</label>
+        </div>
 
        
       <h3>History of Present Illness</h3>
@@ -176,17 +163,17 @@ loadCases();
 
     <!-- 🔽 Oral Mapping moved here -->
     <div class="mapping-wrap" style="position:relative; display:inline-block;">
-<img
-  id="mapImage"
-  class="mapping-img"
-  src="./oralcavitycolornew3.jpeg"
-  alt="oral mapping"
-  style="display:block; max-width:100%;"
-/><canvas id="mapCanvas" class="mapping-canvas" style="position:absolute; left:0; top:0;"></canvas>
+  <img id="mapImage" class="mapping-img" src="assets/oralcavitycolornew3.jpg" alt="oral mapping" style="display:block; max-width:100%;">
+  <canvas id="mapCanvas" class="mapping-canvas" style="position:absolute; left:0; top:0;"></canvas>
 </div>
 
 <label>Lesion Location</label>
 <input id="lesionLocation" type="text" placeholder="Selected regions will appear here">
+
+<div class="prediction-container">
+  <label>Probability:</label>
+  <div id="livePrediction" class="prediction-overlay">--</div>
+</div>
 
     <!-- 🔽 Camera moved here -->
     <hr>
@@ -373,6 +360,7 @@ loadCases();
 
 
 
+
 </div>
 
     <div>
@@ -417,9 +405,14 @@ loadCases();
 
 
 <!-- App modules -->
+ <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+
 <script type="module" src="firebase.js"></script>
 <script type="module" src="script.js"></script>
 <script type="module" src="script_case.js"></script>
+
+
 
 
 
