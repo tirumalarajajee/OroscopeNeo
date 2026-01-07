@@ -5,10 +5,22 @@ const LESION_LABELS = [
   "CANDIDIASIS","SPECKLEDLEUKOPLAKIA","SEVERE DYSPLASIA",
   "OSMF","VERRUCOUSLEUKOPLAKIA"
 ];
+const SHOW_MASKS = true; // set false later
+
 let tmModel = null;
 let tmLiveRunning = false;
 let tmLastRun = 0;
+// ================= ILLUMINATION STATE =================
+let currentLightMode = "WHITE"; 
+// allowed: "WHITE" | "AMBER" | "BLUE"
 
+
+// ================= LIVE PREDICTION CACHE =================
+let livePredictionCache = {
+  label: null,
+  probability: 0,
+  timestamp: 0
+};
 
 let slots = [], tfliteModel = null, csvCache = null, stream = null;
 window.slots = slots;
@@ -55,62 +67,7 @@ function imageDataToDataUrl(imageData){
   return c.toDataURL('image/png');
 }
 
-// ------------------------ Algorithms ------------------------
-function convertToBlackAndWhite(imageData){
-  const w = imageData.width, h = imageData.height;
-  const out = new ImageData(w, h);
-  for(let i = 0; i < imageData.data.length; i += 4){
-    const r = imageData.data[i], g = imageData.data[i+1], b = imageData.data[i+2];
-    const y = 0.299*r + 0.587*g + 0.114*b;
-    out.data[i] = out.data[i+1] = out.data[i+2] = y; out.data[i+3] = 255;
-  }
-  return out;
-}
 
-function changeRedcolor(imageData){
-  const out = new ImageData(imageData.width, imageData.height);
-  const debugMode = q('#debugToggle')?.checked;
-  for(let i = 0; i < imageData.data.length; i += 4){
-    const r = imageData.data[i], g = imageData.data[i+1], b = imageData.data[i+2];
-    const gray = 0.299*r + 0.587*g + 0.114*b;
-    const isDark = gray < 100; // simulate valMask3 dark mask
-    if(isDark){
-      // dark → green (to count)
-      out.data[i] = 0; out.data[i+1] = 255; out.data[i+2] = 0; out.data[i+3] = 255;
-    } else {
-      // keep original
-      out.data[i] = r; out.data[i+1] = g; out.data[i+2] = b; out.data[i+3] = 255;
-    }
-  }
-  return out;
-}
-
-function isolationWhite(imageData){
-  const out = new ImageData(imageData.width, imageData.height);
-  for(let i = 0; i < imageData.data.length; i += 4){
-    const r = imageData.data[i], g = imageData.data[i+1], b = imageData.data[i+2];
-    const gray = 0.299*r + 0.587*g + 0.114*b;
-    const isWhiteRange = gray >= 75 && gray <= 179;
-    if(isWhiteRange){
-      out.data[i] = r; out.data[i+1] = g; out.data[i+2] = b; out.data[i+3] = 255;
-    } else {
-      out.data[i] = 0; out.data[i+1] = 255; out.data[i+2] = 0; out.data[i+3] = 255;
-    }
-  }
-  return out;
-}
-
-// Count only pure green pixels
-function getCount(imageData){
-  let greenCount = 0;
-  for(let i = 0; i < imageData.data.length; i += 4){
-    const r = imageData.data[i], g = imageData.data[i+1], b = imageData.data[i+2];
-    if(r === 0 && g === 255 && b === 0){
-      greenCount += g;
-    }
-  }
-  return greenCount;
-}
 
 // ------------------------ Slots UI ------------------------
 function initSlots() {
@@ -206,18 +163,6 @@ async function captureToSlot(idx) {
   setSlotImage(idx, dataUrl);
 }
 
-async function loadTMWhiteModel() {
-  if (tmModel) return;
-
-  console.log("⏳ Loading TM model...");
-
-  const modelURL = "assets/jsonimage_model/model.json";
-  const metadataURL = "assets/jsonimage_model/metadata.json";
-
-  tmModel = await tmImage.load(modelURL, metadataURL);
-
-  console.log("✅ TM model loaded", tmModel.getClassLabels());
-}
 
 
 // ------------------------ Camera ------------------------
@@ -242,7 +187,7 @@ async function startCamera(){
     stream = await navigator.mediaDevices.getUserMedia({ video:{ deviceId: sel ? { exact: sel } : undefined } });
     $('cameraPreview').srcObject = stream;
   }catch(e){ console.error(e); alert('Cannot start camera: '+e.message); }
-  await startLiveLesionDetection();
+await startLiveLesionDetection();
 
 }
 
@@ -254,6 +199,8 @@ function stopCamera(){
   stopLiveLesionDetection();
 
 }
+
+
 
 // ------------------------ CSV and TFLite ------------------------
 function safeCsvSplit(line){
@@ -269,14 +216,24 @@ function safeCsvSplit(line){
 }
 
 async function loadCsv(){
-  if(csvCache) return csvCache;
-  try{
-    const res = await fetch('assets/finalDDoroscope3825new.csv');
+  if (csvCache) return csvCache;
+  try {
+    const res = await fetch(
+      'https://raw.githubusercontent.com/tirumalarajajee/OroscopeNeo/main/finalDDoroscope3825new.csv'
+    );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
     const txt = await res.text();
     const rows = txt.trim().split(/\r?\n/).map(safeCsvSplit);
-    csvCache = rows; return rows;
-  }catch(e){ console.warn('CSV load error', e); csvCache = []; return []; }
+    csvCache = rows;
+    return rows;
+  } catch (e) {
+    console.warn('CSV load error', e);
+    csvCache = [];
+    return [];
+  }
 }
+
 
 async function loadTflite(){
   try{
@@ -331,101 +288,85 @@ async function getCsvDiagnosisFull(){
 
 // ------------------------ Analyze + Predict + Fuse ------------------------
 async function analyzePredictAndFuse() {
-  console.log(window.slots.map((s,i) => ({ i, hasImage: !!s.dataURL, selected: s.selectedEl?.checked, amber: s.amberEl?.checked })));
-  // Gather selected slots
-  const selected = slots.map((s,i)=>({i,sel:s.selectedEl?.checked,url:s.dataURL}))
-                        .filter(x=>x.url && x.sel);
-                        console.log("Slots state:", slots);
-console.log("Selected:", selected);
+  const selected = slots.filter(s => s.dataURL && s.selectedEl?.checked);
 
   if (selected.length !== 2) {
-  alert('Select exactly two images (with checkboxes ticked).');
-  return;
-}
-
-
-  // Amber slot must be exactly one
-  const amber = slots.map((s,i)=>({i,amber:s.amberEl?.checked,url:s.dataURL}))
-                     .filter(x=>x.url && x.amber);
-  if (amber.length !== 1) {
-    alert('Please mark exactly ONE Amber image.');
+    alert("Select exactly two images");
     return;
   }
 
-  // Detect patch type from UI
-  const patchSelected = Array.from(document.querySelectorAll('#patchGroup input'))
-    .filter(cb => cb.checked)
-    .map(cb => (cb.dataset.key||'').toString().trim().toUpperCase());
-  const useWhiteIsolation = patchSelected.includes('WHITE');
+  // Determine patch type
+ 
 
-  // Get imageData for both selected images
-  const idA = await getImageDataFromDataUrlResized(selected[0].url, ANALYSIS_MAX_DIM);
-  const idB = await getImageDataFromDataUrlResized(selected[1].url, ANALYSIS_MAX_DIM);
+  const patchKeys = getCheckedKeys("patchGroup");
 
-  // Convert to BW first
-  const bwA = convertToBlackAndWhite(idA);
-  const bwB = convertToBlackAndWhite(idB);
+const patchType =
+  patchKeys.some(k => k.toLowerCase().includes("white"))
+    ? "WHITE"
+    : "RED";
 
-  // Apply isolation
-  const maskA = useWhiteIsolation ? isolationWhite(bwA) : changeRedcolor(bwA);
-  const maskB = useWhiteIsolation ? isolationWhite(bwB) : changeRedcolor(bwB);
+const payload = {
+  imgA: selected[0].dataURL,
+  imgB: selected[1].dataURL,
+  patchType,
 
-  // Counts
-  const countA = getCount(maskA);
-  const countB = getCount(maskB);
+  rules: {
+    "Ulcer": getCheckedKey("ulcerGroup"),
+    "Patch": getCheckedKey("patchGroup"),
+    "Growth": getCheckedKey("growthGroup"),
+    "Mucosal Condition": getCheckedKey("mucosaGroup"),
+    "Pigmentation": getCheckedKey("pigmentationGroup"),
+    "Sharp Objects": getCheckedKey("teethGroup"),
 
-  // Percent variation
-  const denom = Math.max(countA, countB, 1);
-  const percents = (Math.abs(countA - countB) / denom) * 100;
+    "Symptoms": getCheckedKeys("symptomGroup").join(";"),
+    "Habits": getCheckedKeys("habitGroup").join(";"),
+    "Oral Mapping": document.getElementById("lesionLocation").value || ""
+  }
+};
 
-  // TFLite predictions
-  let predA = '', predB = '', predText = '';
+
+
+  // 🔗 CLOUD FUNCTION URL (USE YOUR a.run.app URL)
+  const FUNCTION_URL = "https://analyze-pg3snxql4q-uc.a.run.app";
+  
+
+  let result;
   try {
-    predA = await runTFLitePredictionOnImageData(idA);
-    predB = await runTFLitePredictionOnImageData(idB);
-    predText = predA === predB ? (predA || 'N/A') : `${predA || 'N/A'} | ${predB || 'N/A'}`;
-  } catch(e) {
-    console.warn('TFLite prediction failed', e);
-    predText = 'N/A';
+    const res = await fetch(FUNCTION_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      throw new Error("Server error: " + res.status);
+    }
+
+    result = await res.json();
+    if (SHOW_MASKS) {
+  if (result.bwA_png) setSlotImage(6, result.bwA_png);
+  if (result.bwB_png) setSlotImage(7, result.bwB_png);
+  if (result.maskA_png) setSlotImage(8, result.maskA_png);
+  if (result.maskB_png) setSlotImage(9, result.maskB_png);
+}
+
+
+  } catch (err) {
+    console.error(err);
+    alert("Analysis failed: " + err.message);
+    return;
   }
 
-  // Push mask previews
-  try{ putMaskPreviewInSlot(8, maskA, countA); }catch(e){ console.warn('slot9 failed', e); }
-  try{ putMaskPreviewInSlot(9, maskB, countB); }catch(e){ console.warn('slot10 failed', e); }
-  try{ putMaskPreviewInSlot(6, bwA, countA); }catch(e){ console.warn('slot7 failed', e); }
-  try{ putMaskPreviewInSlot(7, bwB, countB); }catch(e){ console.warn('slot8 failed', e); }
-
-  // CSV diagnosis
-  const csvResult = await getCsvDiagnosisFull();
-  const csvText = (csvResult.provisional || csvResult.differential || csvResult.advice)
-    ? `Provisional: ${csvResult.provisional}\nDifferential: ${csvResult.differential}\nAdvice: ${csvResult.advice}`
-    : 'No CSV match found';
-  $('provDiag').value = csvResult.provisional  || '';
-  $('diffDiag').value = csvResult.differential || '';
-  $('advise').value = csvResult.advice || '';
-
-  // Status
-  $('status').textContent = `Mask counts → Img1: ${countA}, Img2: ${countB}`;
-
-  // Conclusion bands
-  let resultText = '';
-  if (percents < 120) {
-    resultText = 'Variable Diagnosis, observe two weeks.';
-  } else if (percents <= 124) {
-    resultText = 'Borderline Dysplasia ? refer to a specialist.';
-  } else {
-    resultText = 'Suggestive of Dysplasia refer to a specialist.';
-  }
-
-  // Final analysis output
+  // ---------------- Display results ----------------
   $('analysis').textContent =
-    `Img1 G-sum: ${countA}\n` +
-    `Img2 G-sum: ${countB}\n` +
-    `Variation%: ${percents.toFixed(2)}%\n` +
-    `TFLite: ${predText}\n\n` +
-    `Condensed Key: ${ddnewfinaltxt()}\n\n` + 
-    `${csvText}\n\n` +
-    `Conclusion: ${resultText}`;
+    `Img1 G-count: ${result.countA}\n` +
+    `Img2 G-count: ${result.countB}\n` +
+    `Variation: ${result.percent}%\n\n` +
+    `Conclusion: ${result.conclusion}`;
+
+  $('provDiag').value = result.provisional || "";
+  $('diffDiag').value = result.differential || "";
+  $('advise').value = result.advice || "";
 }
 
 
@@ -625,7 +566,7 @@ mapCtx.fillText(region.name, lx, ly);
     });
   }
 
-  async function init(){
+  function init(){
     if(!mapImg || !mapCanvas || !lesionInput){
       console.error('Mapping elements not found');
       return;
@@ -646,8 +587,6 @@ mapCtx.fillText(region.name, lx, ly);
       resizeCanvasToImage();
       drawRegions();
     });
-    await loadTMWhiteModel();
-
   }
 
   init();
@@ -700,6 +639,22 @@ function putMaskPreviewInSlot(slotIndex, imageData, count){
   s.previewEl.appendChild(badge);
   s.maskedDataUrl = url; s.maskedCount = count;
 }
+
+import { getDownloadURL, ref } from "firebase/storage";
+
+async function loadTMWhiteModel() {
+  if (tmModel) return;
+
+  const modelRef = ref(storage, "model/lesion_white/model.json");
+  const metaRef  = ref(storage, "model/lesion_white/metadata.json");
+
+  const modelURL = await getDownloadURL(modelRef);
+  const metaURL  = await getDownloadURL(metaRef);
+
+  tmModel = await tmImage.load(modelURL, metaURL);
+  console.log("TM model loaded securely");
+}
+
 
 async function predictFromCameraFrame() {
   if (!tmModel) {
@@ -758,18 +713,51 @@ function stopLiveLesionDetection() {
 }
 
 function displayLivePrediction(predictions) {
+  const top = predictions[0];
+  if (!top) return;
+
+  // confidence gate (adjust if needed)
+  if (top.probability < 0.6) return;
+
+  // 🔐 STORE TEMPORARILY
+  livePredictionCache = {
+    label: top.className,
+    probability: top.probability,
+    timestamp: Date.now()
+  };
+
+  // UI update
   const el = document.getElementById("livePrediction");
-  if (!el) {
-    console.warn("❌ livePrediction element missing");
+  if (el) {
+    el.textContent =
+      `${top.className} (${(top.probability * 100).toFixed(1)}%)`;
+  }
+}
+
+function captureToSlot(idx){
+  const video = $('cameraPreview');
+  if(!video || !video.srcObject){
+    alert('Camera not started');
     return;
   }
 
-  const top = predictions[0];
-  el.textContent = `${top.className} : ${(top.probability * 100).toFixed(1)}%`;
+  const c = document.createElement('canvas');
+  c.width = video.videoWidth;
+  c.height = video.videoHeight;
+  c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
+  const dataUrl = c.toDataURL('image/jpeg', 0.9);
+
+  setSlotImage(idx, dataUrl);
+
+  // ================== ATTACH LIVE PREDICTION ==================
+  if (livePredictionCache.label) {
+    window.slots[idx].lesionPrediction = {
+      label: livePredictionCache.label,
+      probability: livePredictionCache.probability,
+      timestamp: livePredictionCache.timestamp
+    };
+
+    console.log("🧠 Prediction attached to slot", idx,
+      window.slots[idx].lesionPrediction);
+  }
 }
-
-
-
-
-
-
