@@ -7,20 +7,30 @@ const LESION_LABELS = [
 ];
 const SHOW_MASKS = true; // set false later
 
-let tmModel = null;
-let tmLiveRunning = false;
-let tmLastRun = 0;
-// ================= ILLUMINATION STATE =================
-let currentLightMode = "WHITE"; 
-// allowed: "WHITE" | "AMBER" | "BLUE"
+let model = null;
+let predictionRunning = false;
+let lastPredictionTime = 0;
+
+let livePrediction = null;     // keeps updating
+let frozenPrediction = null;   // snapshot at capture
 
 
-// ================= LIVE PREDICTION CACHE =================
-let livePredictionCache = {
-  label: null,
-  probability: 0,
-  timestamp: 0
-};
+
+const MODEL_LABELS = [
+  "Normal",
+  "Leukoplakia",
+  "Lichenplanus",
+  "Candidiasis",
+  "Verrucous leukoplakia",
+  "Speckled leukoplakia",
+  "OSMF",
+  "Severe Dysplasia"
+];
+
+
+const PREDICTION_INTERVAL_MS = 500; // 2 per second (clinical-safe)
+const CONFIDENCE_THRESHOLD = 0.80;
+
 
 let slots = [], tfliteModel = null, csvCache = null, stream = null;
 window.slots = slots;
@@ -155,13 +165,25 @@ async function captureToSlot(idx) {
     alert('Camera not started');
     return;
   }
+
   const c = document.createElement('canvas');
   c.width = video.videoWidth;
   c.height = video.videoHeight;
   c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
+
   const dataUrl = c.toDataURL('image/jpeg', 0.9);
   setSlotImage(idx, dataUrl);
+
+  // 🔑 FREEZE AI PREDICTION FOR FIRST SLOT (View 1)
+  if (idx === 0) {
+    frozenPrediction = livePrediction
+      ? { ...livePrediction }
+      : null;
+
+    console.log("📌 Frozen AI prediction for View 1:", frozenPrediction);
+  }
 }
+
 
 
 
@@ -180,27 +202,34 @@ async function refreshCameras(){
   }catch(e){ console.warn('enumerateDevices', e); }
 }
 
-async function startCamera(){
+async function startCamera() {
   const sel = $('cameraSelect').value;
-  if(stream) stopCamera();
-  try{
-    stream = await navigator.mediaDevices.getUserMedia({ video:{ deviceId: sel ? { exact: sel } : undefined } });
-    $('cameraPreview').srcObject = stream;
-  }catch(e){ console.error(e); alert('Cannot start camera: '+e.message); }
-await startLiveLesionDetection();
 
+  if (stream) stopCamera();
+
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { deviceId: sel ? { exact: sel } : undefined }
+    });
+
+    const video = $('cameraPreview'); // ✅ DEFINE VIDEO HERE
+    video.srcObject = stream;
+    await video.play();
+
+    startLivePrediction(video); // ✅ PASS CORRECT VARIABLE
+  } catch (e) {
+    console.error(e);
+    alert('Cannot start camera: ' + e.message);
+  }
 }
+
 
 function stopCamera(){
   if(stream){
     stream.getTracks().forEach(t => t.stop());
     stream = null; $('cameraPreview').srcObject = null;
   }
-  stopLiveLesionDetection();
-
 }
-
-
 
 // ------------------------ CSV and TFLite ------------------------
 function safeCsvSplit(line){
@@ -367,6 +396,30 @@ const payload = {
   $('provDiag').value = result.provisional || "";
   $('diffDiag').value = result.differential || "";
   $('advise').value = result.advice || "";
+
+  if (frozenPrediction && frozenPrediction.label) {
+
+  const provisional = ($('provDiag').value || "").trim();
+  const aiLabel = frozenPrediction.label;
+
+  // Only act if both values exist and are different
+  if (provisional && aiLabel && provisional !== aiLabel) {
+
+    const diffField = $('diffDiag');
+
+    // Normalize existing differential diagnoses
+    const existing = diffField.value
+      .split(',')
+      .map(v => v.trim())
+      .filter(v => v.length > 0);
+
+    // Prevent duplicates
+    if (!existing.includes(aiLabel)) {
+      existing.push(aiLabel);
+      diffField.value = existing.join(', ');
+    }
+  }
+}
 }
 
 
@@ -598,7 +651,8 @@ mapCtx.fillText(region.name, lx, ly);
 async function init(){
   initSlots();
   await refreshCameras().catch(()=>{});
-  await loadTflite().catch(()=>{});
+  //await loadTflite().catch(()=>{});
+  await loadModel(); 
   // wire buttons
   $('refreshCams').addEventListener('click', refreshCameras);
   $('startCam').addEventListener('click', startCamera);
@@ -640,124 +694,120 @@ function putMaskPreviewInSlot(slotIndex, imageData, count){
   s.maskedDataUrl = url; s.maskedCount = count;
 }
 
-import { getDownloadURL, ref } from "firebase/storage";
 
-async function loadTMWhiteModel() {
-  if (tmModel) return;
+const MODEL_HTTP_URL =
+  "https://tirumalarajajee.github.io/OroscopeNeo/assets/jsonimage_model/model.json";
 
-  const modelRef = ref(storage, "model/lesion_white/model.json");
-  const metaRef  = ref(storage, "model/lesion_white/metadata.json");
+const MODEL_VERSION = "v1"; // change ONLY when model changes
+const LOCAL_MODEL_KEY = `indexeddb://oroscope_model_${MODEL_VERSION}`;
 
-  const modelURL = await getDownloadURL(modelRef);
-  const metaURL  = await getDownloadURL(metaRef);
 
-  tmModel = await tmImage.load(modelURL, metaURL);
-  console.log("TM model loaded securely");
+
+async function loadModel() {
+  await tf.setBackend("wasm");
+  await tf.ready();
+
+  try {
+    model = await tf.loadLayersModel(LOCAL_MODEL_KEY);
+    console.log("Model loaded from IndexedDB");
+  } catch (e) {
+    console.log("Downloading model from server...");
+    model = await tf.loadLayersModel(MODEL_HTTP_URL);
+    await model.save(LOCAL_MODEL_KEY);
+    console.log("Model saved to IndexedDB");
+  }
+  window._model = model;
+console.log("MODEL OBJECT:", model);
+console.log("MODEL OUTPUT SHAPE:", model.outputs[0].shape);
+
 }
 
+function startLivePrediction(video) {
+  console.log("startLivePrediction called");
+ // if (predictionRunning) return;
+  predictionRunning = true;
 
-async function predictFromCameraFrame() {
-  if (!tmModel) {
-    console.warn("❌ TM model not loaded");
-    return null;
-  }
+  async function loop() {
+    console.log("prediction loop tick");
 
-  const video = document.getElementById("cameraPreview");
-  if (!video || video.readyState < 2) {
-    console.warn("❌ Video not ready");
-    return null;
-  }
-
-  const predictions = await tmModel.predict(video);
-  console.log("📊 Predictions:", predictions);
-
-  predictions.sort((a, b) => b.probability - a.probability);
-  return predictions;
-}
-
-
-
-async function startLiveLesionDetection() {
-  if (tmLiveRunning) return;
-
-  await loadTMWhiteModel();   // ✅ now legal
-
-  tmLiveRunning = true;
-  tmLastRun = 0;
-
-  const loop = async () => {
-    if (!tmLiveRunning) return;
+    if (!predictionRunning) return;
 
     const now = performance.now();
-    if (now - tmLastRun > 600) {
-      tmLastRun = now;
-      try {
-        const preds = await predictFromCameraFrame();
-        if (preds && preds.length) {
-          displayLivePrediction(preds);
-        }
-      } catch (e) {
-        console.warn("TM live prediction failed", e);
-      }
+    if (now - lastPredictionTime < PREDICTION_INTERVAL_MS) {
+      requestAnimationFrame(loop);
+      return;
     }
+    lastPredictionTime = now;
+
+    const input = tf.tidy(() =>
+      tf.browser.fromPixels(video)
+        .resizeBilinear([224, 224])
+        .toFloat()
+        .div(255)
+        .expandDims(0)
+    );
+
+    const output = model.predict(input);
+    const scores = output.dataSync();
+
+    tf.dispose(output);
+
+    handlePrediction(scores);
+    console.log("Scores:", scores, "Length:", scores.length);
+
 
     requestAnimationFrame(loop);
-  };
-
-  requestAnimationFrame(loop);
-}
-
-
-function stopLiveLesionDetection() {
-  tmLiveRunning = false;
-}
-
-function displayLivePrediction(predictions) {
-  const top = predictions[0];
-  if (!top) return;
-
-  // confidence gate (adjust if needed)
-  if (top.probability < 0.6) return;
-
-  // 🔐 STORE TEMPORARILY
-  livePredictionCache = {
-    label: top.className,
-    probability: top.probability,
-    timestamp: Date.now()
-  };
-
-  // UI update
-  const el = document.getElementById("livePrediction");
-  if (el) {
-    el.textContent =
-      `${top.className} (${(top.probability * 100).toFixed(1)}%)`;
   }
+
+  loop();
 }
 
-function captureToSlot(idx){
-  const video = $('cameraPreview');
-  if(!video || !video.srcObject){
-    alert('Camera not started');
+
+function handlePrediction(scores) {
+  let maxIdx = 0;
+  for (let i = 1; i < scores.length; i++) {
+    if (scores[i] > scores[maxIdx]) maxIdx = i;
+  }
+
+  const confidence = scores[maxIdx];
+
+  if (confidence < CONFIDENCE_THRESHOLD) {
+    livePrediction = null;
+    updateUI("--", 0);
     return;
   }
 
-  const c = document.createElement('canvas');
-  c.width = video.videoWidth;
-  c.height = video.videoHeight;
-  c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
-  const dataUrl = c.toDataURL('image/jpeg', 0.9);
+  // 🔑 SOURCE OF TRUTH
+  livePrediction = {
+    label: MODEL_LABELS[maxIdx],
+    confidence: confidence
+  };
 
-  setSlotImage(idx, dataUrl);
-
-  // ================== ATTACH LIVE PREDICTION ==================
-  if (livePredictionCache.label) {
-    window.slots[idx].lesionPrediction = {
-      label: livePredictionCache.label,
-      probability: livePredictionCache.probability,
-      timestamp: livePredictionCache.timestamp
-    };
-
-    console.log("🧠 Prediction attached to slot", idx,
-      window.slots[idx].lesionPrediction);
-  }
+  // 🔑 UI IS JUST A VIEW
+  updateUI(livePrediction.label, livePrediction.confidence);
 }
+
+function updateUI(label, confidence) {
+  const el = document.getElementById("livePrediction");
+  console.log("Updating UI", label, confidence, el);
+
+  if (!el) {
+    alert("livePrediction element NOT FOUND");
+    return;
+  }
+
+  el.style.position = "fixed";
+  el.style.top = "10px";
+  el.style.left = "10px";
+  el.style.zIndex = "9999";
+  el.style.background = "black";
+  el.style.color = "lime";
+  el.style.fontSize = "20px";
+  el.style.padding = "10px";
+
+  el.innerText = `${label} (${(confidence * 100).toFixed(1)}%)`;
+  
+
+}
+
+
