@@ -52,11 +52,16 @@ onAuthStateChanged(auth, async user => {
 });
 //  ======================= pdf functions ====================
 function enablePdfExport() {
-  const btn = document.getElementById("pdfBtn");
-  if (!btn) return;
-
-  btn.style.display = "inline-block";
+  requestAnimationFrame(() => {
+    const btn = document.getElementById("pdfBtn");
+    if (!btn) {
+      console.warn("pdfBtn not yet in DOM");
+      return;
+    }
+    btn.style.display = "inline-block";
+  });
 }
+
 
 
 // ======================= UI RESTORE ====================
