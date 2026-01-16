@@ -179,7 +179,7 @@ loadCases();
 <img
   id="mapImage"
   class="mapping-img"
-  src="./oralcavitycolornew3.jpeg"
+  src="oralcavitycolornew3.jpeg"
   alt="oral mapping"
   style="display:block; max-width:100%;"
 /><canvas id="mapCanvas" class="mapping-canvas" style="position:absolute; left:0; top:0;"></canvas>
@@ -403,6 +403,7 @@ loadCases();
  
   <button id="saveBtn" class="btn btn-primary">Save (Auth required)</button>
   <button id="clearBtn" class="btn btn-ghost">Reset Form</button>
+  <button id="pdfBtn" class="btn btn-primary">Export PDF</button>
   <div class="status small" id="status"></div>
 </div>
 
@@ -426,7 +427,10 @@ loadCases();
 <!-- App modules -->
  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.16.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.16.0/dist/tf-backend-wasm.min.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  console.log("jsPDF test:", window.jspdf);
+</script>
 <script type="module" src="firebase.js"></script>
 <script type="module" src="script.js"></script>
 <script type="module" src="script_case.js"></script>

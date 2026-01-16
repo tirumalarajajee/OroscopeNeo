@@ -27,6 +27,65 @@ const MODEL_LABELS = [
   "Severe Dysplasia"
 ];
 
+window.caseGroups = {
+  patch: [],
+  habit: [],
+  ulcer: [],
+  symptom: []
+};
+
+function updateGroup(groupArray, checked, value) {
+  if (checked) {
+    if (!groupArray.includes(value)) {
+      groupArray.push(value);
+    }
+  } else {
+    const idx = groupArray.indexOf(value);
+    if (idx !== -1) {
+      groupArray.splice(idx, 1);
+    }
+  }
+}
+document.addEventListener("click", e => {
+  if (e.target && e.target.id === "pdfBtn") {
+    generateCasePDF();
+  }
+});
+
+
+document.addEventListener("change", e => {
+  const el = e.target;
+  if (el.type !== "checkbox") return;
+
+  const value = el.value || el.parentElement.textContent.trim();
+
+  // PATCH GROUP
+  if (el.closest("#patchgroup")) {
+    updateGroup(window.caseGroups.patch, el.checked, value);
+  }
+
+  // ULCER GROUP
+  else if (el.closest("#ulcerGroup")) {
+    updateGroup(window.caseGroups.ulcer, el.checked, value);
+  }
+
+  // HABIT GROUP
+  else if (el.closest("#habitGroup")) {
+    updateGroup(window.caseGroups.habit, el.checked, value);
+  }
+
+  // SYMPTOM GROUP
+  else if (el.closest("#pigmentationGroup")) {
+    updateGroup(window.caseGroups.symptom, el.checked, value);
+  }
+  else if (el.closest("#symptomGroup")) {
+    updateGroup(window.caseGroups.symptom, el.checked, value);
+  }
+
+  // (add more groups here if needed)
+});
+
+
 
 const PREDICTION_INTERVAL_MS = 500; // 2 per second (clinical-safe)
 const CONFIDENCE_THRESHOLD = 0.80;
@@ -809,5 +868,176 @@ function updateUI(label, confidence) {
   
 
 }
+
+
+function getGroupValues(selector) {
+  return [...document.querySelectorAll(selector)]
+    .filter(el => el.checked)
+    .map(el => el.value || el.parentElement.textContent.trim());
+}
+
+
+function addGroupSection(pdf, title, values, y) {
+  if (!values || values.length === 0) return y;
+
+  // Page overflow check
+  if (y > 270) {
+    pdf.addPage();
+    y = 10;
+  }
+
+  pdf.setFontSize(11);
+  pdf.text(title, 10, y);
+  y += 6;
+
+  pdf.setFontSize(9);
+  values.forEach(v => {
+    if (y > 280) {
+      pdf.addPage();
+      y = 10;
+    }
+    pdf.text(`• ${v}`, 12, y);
+    y += 4;
+  });
+
+  return y + 4;
+}
+
+function getSelectedSlotImages() {
+  return (window.slots || [])
+    .map((s, i) => ({ s, i }))
+    .filter(x =>
+      x.s &&
+      x.s.dataURL &&
+      x.s.selectedEl &&
+      x.s.selectedEl.checked
+    )
+    .map(x => ({
+      index: x.i,
+      dataURL: x.s.dataURL
+    }));
+}
+
+
+
+//fucntion pdf
+
+
+
+
+
+
+async function generateCasePDF() {
+  if (!window.jspdf?.jsPDF) {
+    alert("PDF library not loaded");
+    return;
+  }
+console.log("Patch group:", window.caseGroups.patch);
+console.log("Habit group:", window.caseGroups.ulcer);
+
+  const pdf = new window.jspdf.jsPDF("p", "mm", "a4");
+  let y = 10;
+
+  // ---- HEADER ----
+  pdf.setFontSize(16);
+  pdf.text("ORAL EXAMINATION REPORT", 105, y, { align: "center" });
+  y += 10;
+
+  pdf.setFontSize(10);
+  pdf.text(`Date: ${new Date().toLocaleString()}`, 10, y);
+  y += 8;
+
+  // ---- PATIENT INFO ----
+  const fields = [
+    ["Name", $("name").value],
+    ["Case No", $("caseNumber").value],
+    ["Age", $("age").value],
+    ["Gender", $("gender").value],
+    ["Duration", $("duration").value],
+    ["Lesion Location", $("lesionLocation").value]
+  ];
+
+  pdf.setFontSize(11);
+  pdf.text("Patient Details", 10, y);
+  y += 6;
+
+  pdf.setFontSize(10);
+  fields.forEach(([k, v]) => {
+    pdf.text(`${k}: ${v || "-"}`, 10, y);
+    y += 5;
+  });
+
+  y += 6;
+
+  // ---- ANALYSIS ----
+  pdf.setFontSize(11);
+  pdf.text("Analysis", 10, y);
+  y += 6;
+
+  pdf.setFontSize(9);
+  pdf.text(pdf.splitTextToSize($("analysis").textContent || "-", 190), 10, y);
+  y += 25;
+
+  // ---- DIAGNOSIS ----
+  pdf.setFontSize(11);
+  pdf.text("Diagnosis", 10, y);
+  y += 6;
+
+  pdf.setFontSize(10);
+  pdf.text(`Provisional: ${$("provDiag").value || "-"}`, 10, y);
+  y += 5;
+  pdf.text(`Differential: ${$("diffDiag").value || "-"}`, 10, y);
+  y += 5;
+  pdf.text(`Advice: ${$("advise").value || "-"}`, 10, y);
+  y += 8;
+
+  // ---- GROUP DATA ----
+ y = addGroupSection(pdf, "Patch Group", window.caseGroups.patch, y);
+y = addGroupSection(pdf, "Habit History", window.caseGroups.habit, y);
+
+
+  // ---- IMAGES ----
+  const images = getSelectedSlotImages();
+
+if (images.length) {
+  console.log("PDF selected images:", getSelectedSlotImages());
+
+  pdf.addPage();
+  y = 10;
+
+  pdf.setFontSize(11);
+  pdf.text("Clinical Images", 10, y);
+  y += 6;
+
+  let x = 10;
+  const imgW = 60, imgH = 45;
+
+  images.forEach((img, i) => {
+    if (y + imgH > 280) {
+      pdf.addPage();
+      y = 10;
+      x = 10;
+    }
+
+    pdf.addImage(img.dataURL, "JPEG", x, y, imgW, imgH);
+    pdf.setFontSize(8);
+    pdf.text(`View ${img.index + 1}`, x, y + imgH + 4);
+
+    x += imgW + 6;
+    if (x > 140) {
+      x = 10;
+      y += imgH + 12;
+    }
+  });
+}
+
+
+  pdf.save(`Case_${$("caseNumber").value || "Report"}.pdf`);
+}
+
+
+  
+
+
 
 
