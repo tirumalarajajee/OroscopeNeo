@@ -46,6 +46,9 @@ function updateGroup(groupArray, checked, value) {
     }
   }
 }
+
+
+
 document.addEventListener("click", e => {
   if (e.target && e.target.id === "pdfBtn") {
     generateCasePDF();
@@ -93,6 +96,8 @@ const CONFIDENCE_THRESHOLD = 0.80;
 
 let slots = [], tfliteModel = null, csvCache = null, stream = null;
 window.slots = slots;
+
+
 
 function $(id){ return document.getElementById(id) }
 const q = sel => document.querySelector(sel);
@@ -1034,6 +1039,8 @@ if (images.length) {
 
   pdf.save(`Case_${$("caseNumber").value || "Report"}.pdf`);
 }
+
+
 
 
   
