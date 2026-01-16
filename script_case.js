@@ -62,6 +62,18 @@ function enablePdfExport() {
   });
 }
 
+function rebuildCaseGroupsFromUI() {
+  window.caseGroups = {
+    patch:   getGroupValues("#patchGroup input"),
+    ulcer:   getGroupValues("#ulcerGroup input"),
+	growth:   getGroupValues("#growthGroup input"),
+    mucosa:   getGroupValues("#mucosaGroup input"),
+	pigmentation:   getGroupValues("#pigmentationGroup input"),
+    teeth:   getGroupValues("#teethGroup input"),
+    habit:   getGroupValues("#habitGroup input"),     // multi
+    symptom: getGroupValues("#symptomGroup input"),   // multi
+  };
+}
 
 
 // ======================= UI RESTORE ====================
@@ -129,6 +141,9 @@ async function loadCase(caseId) {
 
     restoreMultiCheckbox("symptomGroup", d.symptoms || []);
     restoreMultiCheckbox("habitGroup", d.habits || []);
+	
+	// 🔑 REQUIRED — sync UI → memory
+    rebuildCaseGroupsFromUI();
 
     // ✅ Restore Storage image URLs into slots
     restoreSlots(d.imageUrls || []);

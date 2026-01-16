@@ -90,6 +90,10 @@ document.addEventListener("change", e => {
 
 
 
+
+
+
+
 const PREDICTION_INTERVAL_MS = 500; // 2 per second (clinical-safe)
 const CONFIDENCE_THRESHOLD = 0.80;
 
@@ -933,6 +937,8 @@ function getSelectedSlotImages() {
 
 
 async function generateCasePDF() {
+	rebuildCaseGroupsFromUI();
+
   if (!window.jspdf?.jsPDF) {
     alert("PDF library not loaded");
     return;
