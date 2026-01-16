@@ -50,6 +50,14 @@ onAuthStateChanged(auth, async user => {
     await loadCase(editingCaseId);
   }
 });
+//  ======================= pdf functions ====================
+function enablePdfExport() {
+  const btn = document.getElementById("pdfBtn");
+  if (!btn) return;
+
+  btn.style.display = "inline-block";
+}
+
 
 // ======================= UI RESTORE ====================
 function restoreCheckbox(groupId, value){
@@ -119,6 +127,7 @@ async function loadCase(caseId) {
 
     // ✅ Restore Storage image URLs into slots
     restoreSlots(d.imageUrls || []);
+	enablePdfExport();
 
   } catch (e) {
     console.error("loadCase failed", e);
