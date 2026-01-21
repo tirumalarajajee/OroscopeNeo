@@ -1191,6 +1191,7 @@ async function generateCasePDF() {
   [
     ["Name", $("name").value],
     ["Case No", $("caseNumber").value],
+    ["Case ID", $("caseId").value],
     ["Age", $("age").value],
     ["Gender", $("gender").value]
   ].forEach(([k, v]) => {
