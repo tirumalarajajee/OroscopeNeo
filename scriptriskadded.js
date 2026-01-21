@@ -1,8 +1,6 @@
 // Analysis logic: if 'White' patch selected -> use isolationWhite(); else use red isolation
 console.log("script.js LOADED");
 
-import { ensureRiskIndexLoaded, getRiskValue } from "./riskIndexStore.js";
-
 import { caseGroups } from "./state.js";
 const ANALYSIS_MAX_DIM = 800;
 const LESION_LABELS = [
@@ -32,12 +30,6 @@ const MODEL_LABELS = [
   "Severe Dysplasia"
 ];
 //risk index
-document.addEventListener("DOMContentLoaded", async () => {
-  await ensureRiskIndexLoaded();
-  console.log("Risk index CSV cached in IndexedDB");
-});
-
-
 const DIAGNOSIS_CODE_MAP = [
   ["NOTHING ABNORMAL DETECTED", "NAD"],
   ["APHTHOUS ULCER", "AU"],
@@ -93,8 +85,24 @@ function getRiskBandCode(text) {
   return null;
 }
 
+let riskIndexMap = null;
 
+async function loadRiskIndexCSV() {
+  if (riskIndexMap) return riskIndexMap;
 
+  const res = await fetch("./assets/Riskindexcsvnew.csv");
+  const text = await res.text();
+
+  riskIndexMap = {};
+  text.split("\n").forEach(line => {
+    const cols = line.split(",");
+    if (cols.length >= 2) {
+      riskIndexMap[cols[0].trim().toUpperCase()] = cols[1].trim();
+    }
+  });
+
+  return riskIndexMap;
+}
 async function computeAndStoreRisk() {
   const diagnosisText = $("provDiag").value;
   const analysisText = $("analysis").textContent;
@@ -107,42 +115,25 @@ async function computeAndStoreRisk() {
     return;
   }
 
-  const riskKey = (diagnosisCode + riskBand).toUpperCase();
+  const riskKey = diagnosisCode + riskBand;
 
-  const riskScore = await getRiskValue(riskKey);
+  const riskMap = await loadRiskIndexCSV();
+  const riskScore = riskMap[riskKey] || null;
 
   window.caseRisk = {
     diagnosisCode,
     riskBand,
     riskKey,
-    riskScore: riskScore || "",
+    riskScore,
     computedAt: new Date().toISOString()
   };
 
   console.log("Risk computed:", window.caseRisk);
-
-  updateRiskUI();
 }
-
 function updateRiskUI() {
-  if (!window.caseRisk) return;
-  $("riskIndex").value = window.caseRisk.riskScore || "";
-}
+  if (!window.caseRisk?.riskScore) return;
 
-
-//checkboxes must condition
-function validateAtLeastOneSelection(caseGroups) {
-  if (!caseGroups || typeof caseGroups !== "object") return false;
-
-  return Object.values(caseGroups).some(
-    arr => Array.isArray(arr) && arr.length > 0
-  );
-}
-
-function getEmptyCaseGroups(caseGroups) {
-  return Object.entries(caseGroups)
-    .filter(([_, arr]) => Array.isArray(arr) && arr.length === 0)
-    .map(([key]) => key);
+  $("riskIndex").value = window.caseRisk.riskScore;
 }
 
 
@@ -916,35 +907,19 @@ async function init(){
   wireAnalyze();
 }
 
-function wireAnalyze() {
+function wireAnalyze(){
   const btn = $('analyzeBtn');
-
-  btn.addEventListener('click', async () => {
-    btn.disabled = true;
-    btn.textContent = 'Analyzing...';
-
-    try {
-      const empty = getEmptyCaseGroups(caseGroups);
-
-      // ❌ ALL groups empty → block analysis
-      if (empty.length === Object.keys(caseGroups).length) {
-        alert("Please select at least one clinical finding before analysis.");
-        return;
-      }
-
-      // ✅ Proceed
+  btn.addEventListener('click', async ()=>{
+    btn.disabled = true; btn.textContent = 'Analyzing...';
+    try{
       await analyzePredictAndFuse();
-
-    } catch (e) {
-      console.error(e);
-      alert('Analysis error: ' + e.message);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Analyze Selected Images';
+    }catch(e){
+      console.error(e); alert('Analysis error: '+e.message);
+    }finally{
+      btn.disabled = false; btn.textContent = 'Analyze Selected Images';
     }
   });
 }
-
 
 window.addEventListener('DOMContentLoaded', init);
 

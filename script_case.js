@@ -1,4 +1,39 @@
 // ======================= IMPORTS =======================
+console.log("script_case.js LOADED");
+
+import { caseGroups } from "./state.js";
+window._debugCaseGroups = caseGroups;
+
+function bindGroupCheckboxes() {
+  document
+    .querySelectorAll('input[type="checkbox"][data-group][data-key]')
+    .forEach(cb => {
+      cb.addEventListener("change", () => {
+        const group = cb.dataset.group;
+        const value = cb.dataset.key;
+
+        if (!group || !value) return;
+
+        if (cb.checked) {
+          if (!caseGroups[group].includes(value)) {
+            caseGroups[group].push(value);
+          }
+        } else {
+          caseGroups[group] =
+            caseGroups[group].filter(v => v !== value);
+        }
+
+        console.log("Updated groups:", caseGroups);
+      });
+    });
+}
+
+document.addEventListener("DOMContentLoaded", bindGroupCheckboxes);
+
+
+
+
+
 import {
   auth,
   db,
@@ -9,6 +44,8 @@ import {
   collection,
   serverTimestamp,uploadFromSource
 } from "./firebase.js";
+
+
 
 // ======================= HELPERS =======================
 function $(id){ return document.getElementById(id); }
@@ -50,31 +87,6 @@ onAuthStateChanged(auth, async user => {
     await loadCase(editingCaseId);
   }
 });
-//  ======================= pdf functions ====================
-function enablePdfExport() {
-  requestAnimationFrame(() => {
-    const btn = document.getElementById("pdfBtn");
-    if (!btn) {
-      console.warn("pdfBtn not yet in DOM");
-      return;
-    }
-    btn.style.display = "inline-block";
-  });
-}
-
-function rebuildCaseGroupsFromUI() {
-  window.caseGroups = {
-    patch:   getGroupValues("#patchGroup input"),
-    ulcer:   getGroupValues("#ulcerGroup input"),
-	growth:   getGroupValues("#growthGroup input"),
-    mucosa:   getGroupValues("#mucosaGroup input"),
-	pigmentation:   getGroupValues("#pigmentationGroup input"),
-    teeth:   getGroupValues("#teethGroup input"),
-    habit:   getGroupValues("#habitGroup input"),     // multi
-    symptom: getGroupValues("#symptomGroup input"),   // multi
-  };
-}
-
 
 // ======================= UI RESTORE ====================
 function restoreCheckbox(groupId, value){
@@ -94,18 +106,21 @@ function restoreSlots(urls) {
   (window.slots || []).forEach((s, i) => {
     const url = urls[i];
     if (url) {
-      s.dataURL = url; // store URL for consistency
+      s.remoteURL = url;
+
       if (s.previewEl) {
-        s.previewEl.innerHTML = `<img src="${url}" style="max-width:100%; max-height:140px; display:block" />`;
+        s.previewEl.innerHTML =
+          `<img src="${url}" style="max-width:100%; max-height:140px; display:block" />`;
       }
     } else {
-      s.dataURL = null;
+      s.remoteURL = null;
       if (s.previewEl) {
         s.previewEl.innerHTML = '<div class="small">No image</div>';
       }
     }
   });
 }
+
 
 
 // ======================= LOAD CASE =====================
@@ -130,7 +145,7 @@ async function loadCase(caseId) {
     $("provDiag").value    = d.provisionalDiagnosis || "";
     $("diffDiag").value    = d.differentialDiagnosis || "";
     $("advise").value      = d.advice || "";
-
+    $("riskIndex").value = d.riskIndex;
     restoreCheckbox("ulcerGroup", d.ulcer);
     restoreCheckbox("patchGroup", d.patch);
     restoreCheckbox("growthGroup", d.growth);
@@ -141,18 +156,17 @@ async function loadCase(caseId) {
 
     restoreMultiCheckbox("symptomGroup", d.symptoms || []);
     restoreMultiCheckbox("habitGroup", d.habits || []);
-	
-	// 🔑 REQUIRED — sync UI → memory
-    rebuildCaseGroupsFromUI();
 
     // ✅ Restore Storage image URLs into slots
     restoreSlots(d.imageUrls || []);
-	enablePdfExport();
 
   } catch (e) {
     console.error("loadCase failed", e);
   }
 }
+
+
+
 
 // ======================= SAVE CASE =====================
 
@@ -207,11 +221,13 @@ async function saveCase() {
     habits: getCheckedKeys("habitGroup"),
     teeth: getCheckedKey("teethGroup"),
     illness: getCheckedKey("illnessGroup"),
+
     mappingLocation: $("lesionLocation").value || "",
     analysisText: $("analysis").textContent || "",
     provisionalDiagnosis: $("provDiag").value || "",
     differentialDiagnosis: $("diffDiag").value || "",
     advice: $("advise").value || "",
+     riskIndex: $("riskIndex").value || "",
     condensedKey: typeof window.ddnewfinaltxt === "function" ? window.ddnewfinaltxt() : "",
     imageUrls, // ✅ only URLs now
     updatedAt: serverTimestamp(),
@@ -233,6 +249,7 @@ async function saveCase() {
 // ======================= BUTTON ========================
 document.addEventListener("DOMContentLoaded", () => {
   $("saveBtn")?.addEventListener("click", saveCase);
+  
 });
 
 // ======================= CHECK HELPERS =================

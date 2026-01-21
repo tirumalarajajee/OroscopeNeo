@@ -82,12 +82,12 @@ loadCases();
 
        <h3>ULCER</h3>
 <div class="checkbox-row" id="ulcerGroup">
-  <label><input type="checkbox" data-key="Round Ulcer"> Round Ulcer</label>
-  <label><input type="checkbox" data-key="Irregular <1cm, <2 Weeks"> Irregular &lt;1cm &lt;2 Weeks</label>
-  <label><input type="checkbox" data-key="Irregular <1cm, >2 Weeks"> Irregular &lt;1cm &gt;2 Weeks</label>
-  <label><input type="checkbox" data-key="Irregular >1cm, <2 Weeks"> Irregular &gt;1cm &lt;2 Weeks</label>
-  <label><input type="checkbox" data-key="Irregular >1cm, >2 Weeks"> Irregular &gt;1cm &gt;2 Weeks</label>
-  <label><input type="checkbox" data-key="No Abnormality Detected"> NAD</label>
+  <label><input type="checkbox" data-group="ulcer" data-key="Round Ulcer"> Round Ulcer</label>
+  <label><input type="checkbox" data-group="ulcer" data-key="Irregular &lt;1cm, &lt;2 Weeks"> Irregular &lt;1cm &lt;2 Weeks</label>
+  <label><input type="checkbox" data-group="ulcer" data-key="Irregular &lt;1cm, &gt;2 Weeks"> Irregular &lt;1cm &gt;2 Weeks</label>
+  <label><input type="checkbox" data-group="ulcer" data-key="Irregular &gt;1cm, &lt;2 Weeks"> Irregular &gt;1cm &lt;2 Weeks</label>
+  <label><input type="checkbox" data-group="ulcer" data-key="Irregular &gt;1cm, &gt;2 Weeks"> Irregular &gt;1cm &gt;2 Weeks</label>
+  <label><input type="checkbox" data-group="ulcer" data-key="No Abnormality Detected"> NAD</label>
 </div>
 
 
@@ -99,34 +99,34 @@ loadCases();
 
     <h3>Patch</h3>
 <div class="checkbox-row" id="patchGroup">
-  <label><input type="checkbox" data-key="Red Patch"> Red Patch</label>
-  <label><input type="checkbox" data-key="White Patch"> White Patch</label>
-  <label><input type="checkbox" data-key="Red & White Patch"> Red & White Patch</label>
-  <label><input type="checkbox" data-key="Red patch with whitelines"> Red patch with white lines</label>
-  <label><input type="checkbox" data-key="No Abnormality Detected"> NAD</label>
+  <label><input type="checkbox" data-group="patch" data-key="Red Patch"> Red Patch</label>
+  <label><input type="checkbox" data-group="patch" data-key="White Patch"> White Patch</label>
+  <label><input type="checkbox" data-group="patch" data-key="Red & White Patch"> Red & White Patch</label>
+  <label><input type="checkbox" data-group="patch" data-key="Red patch with whitelines"> Red patch with white lines</label>
+  <label><input type="checkbox" data-group="patch" data-key="No Abnormality Detected"> NAD</label>
 </div>
 
 
  <h3>Growth</h3>
 <div class="checkbox-row" id="growthGroup">
-  <label><input type="checkbox" data-key="Round Growth"> Round Growth</label>
-  <label><input type="checkbox" data-key="Irregular Growth <1cm"> Irregular &lt;1cm</label>
-  <label><input type="checkbox" data-key="Irregular Growth >1cm"> Irregular &gt;1cm</label>
-  <label><input type="checkbox" data-key="No Abnormality Detected"> NAD</label>
+  <label><input type="checkbox" data-group="growth" data-group="patch" data-key="Round Growth"> Round Growth</label>
+  <label><input type="checkbox" data-group="growth" data-key="Irregular Growth &lt;1cm"> Irregular &lt;1cm</label>
+  <label><input type="checkbox" data-group="growth" data-key="Irregular Growth &gt;1cm"> Irregular &gt;1cm</label>
+  <label><input type="checkbox" data-group="growth" data-key="No Abnormality Detected"> NAD</label>
 </div>
 
 <h3>Mucosal Condition</h3>
 <div class="checkbox-row" id="mucosaGroup">
-  <label><input type="checkbox" data-key="Marble Appearance"> Marble Appearance</label>
-  <label><input type="checkbox" data-key="No Abnormality Detected"> NAD</label>
+  <label><input type="checkbox" data-group="mucosa" data-key="Marble Appearance"> Marble Appearance</label>
+  <label><input type="checkbox" data-group="mucosa" data-key="No Abnormality Detected"> NAD</label>
 </div>
 
 
 
         <h3>Pigmentation</h3>
 <div class="checkbox-row" id="pigmentationGroup">
-  <label><input type="checkbox" data-key="Dark Pigmentation"> Dark Pigmentation</label>
-  <label><input type="checkbox" data-key="No Abnormality Detected"> NAD</label>
+  <label><input type="checkbox" data-group="pigmentation" data-key="Dark Pigmentation"> Dark Pigmentation</label>
+  <label><input type="checkbox" data-group="pigmentation" data-key="No Abnormality Detected"> NAD</label>
 </div>
 
 
@@ -134,39 +134,40 @@ loadCases();
 
         <h3>Symptoms</h3>
 <div class="checkbox-row" id="symptomGroup">
-  <label><input type="checkbox" data-key="Pain"> Pain</label>
-  <label><input type="checkbox" data-key="Redness"> Redness</label>
-  <label><input type="checkbox" data-key="Swelling"> Swelling</label>
-  <label><input type="checkbox" data-key="Burning"> Burning</label>
-  <label><input type="checkbox" data-key="Difficulty in Eating"> Difficulty in Eating</label>
-  <label><input type="checkbox" data-key="Blanching"> Blanching</label>
-  <label><input type="checkbox" data-key="No Symptoms"> No Symptoms</label>
+  <label><input type="checkbox" data-group="symptom" data-key="Pain"> Pain</label>
+  <label><input type="checkbox" data-group="symptom" data-key="Redness"> Redness</label>
+  <label><input type="checkbox" data-group="symptom" data-key="Swelling"> Swelling</label>
+  <label><input type="checkbox" data-group="symptom" data-key="Burning"> Burning</label>
+  <label><input type="checkbox" data-group="symptom" data-key="Difficulty in Eating"> Difficulty in Eating</label>
+  <label><input type="checkbox" data-group="symptom" data-key="Blanching"> Blanching</label>
+  <label><input type="checkbox" data-group="symptom" data-key="No Symptoms"> No Symptoms</label>
 </div>
 
 
         <h3>Habits</h3>
 <div class="checkbox-row" id="habitGroup">
-  <label><input type="checkbox" data-key="Multiple habits"> Multiple habits</label>
-  <label><input type="checkbox" data-key="Smoking"> Smoking</label>
-  <label><input type="checkbox" data-key="Alcohol"> Alcohol</label>
-  <label><input type="checkbox" data-key="Pan Chewing"> Pan Chewing</label>
-  <label><input type="checkbox" data-key="Tobacco Chewing"> Tobacco Chewing</label>
-  <label><input type="checkbox" data-key="Spicy Foods"> Spicy Foods</label>
-  <label><input type="checkbox" data-key="No Habits"> No Habits</label>
+  <label><input type="checkbox" data-group="habit" data-key="Multiple habits"> Multiple habits</label>
+  <label><input type="checkbox" data-group="habit" data-key="Smoking"> Smoking</label>
+  <label><input type="checkbox" data-group="habit" data-key="Alcohol"> Alcohol</label>
+  <label><input type="checkbox" data-group="habit" data-key="Pan Chewing"> Pan Chewing</label>
+  <label><input type="checkbox" data-group="habit" data-key="Tobacco Chewing"> Tobacco Chewing</label>
+  
+  <label><input type="checkbox" data-group="habit" data-key="Spicy Foods"> Spicy Foods</label>
+  <label><input type="checkbox" data-group="habit" data-key="No Habits"> No Habits</label>
 </div>
 
 
        <h3>Sharp Objects</h3>
 <div class="checkbox-row" id="teethGroup">
-  <label><input type="checkbox" data-key="Detected"> Detected</label>
-  <label><input type="checkbox" data-key="Not detected"> Not detected</label>
+  <label><input type="checkbox" data-group="teeth" data-key="Detected"> Detected</label>
+  <label><input type="checkbox" data-group="teeth" data-key="Not detected"> Not detected</label>
 </div>
 
        
       <h3>History of Present Illness</h3>
     <div class="checkbox-row" id="illnessGroup">
-      <label><input type="checkbox" data-key="histYes"> Yes</label>
-      <label><input type="checkbox" data-key="histNo"> No</label>
+      <label><input type="checkbox" data-group="illness" data-key="Yes"> Yes</label>
+      <label><input type="checkbox" data-group="illness" data-key="No"> No</label>
     </div>
     <label>Your description of previous visit</label>
     <textarea id="prevVisit" rows="3" placeholder="your description of previous visit"></textarea>
@@ -214,7 +215,7 @@ loadCases();
   <div style="display:flex;justify-content:space-between">
     <strong>View 1</strong>
     <label><input type="checkbox" id="slot-select-0"> Select</label>
-    <label><input type="checkbox" id="slot-amber-0"> Amber</label>
+    
   </div>
    <div class="preview">
     <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
@@ -230,7 +231,7 @@ loadCases();
   <div style="display:flex;justify-content:space-between">
     <strong>View 2</strong>
     <label><input type="checkbox" id="slot-select-1"> Select</label>
-    <label><input type="checkbox" id="slot-amber-1"> Amber</label>
+    
   </div>
    <div class="preview">
     <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
@@ -246,7 +247,7 @@ loadCases();
   <div style="display:flex;justify-content:space-between">
     <strong>View 3</strong>
     <label><input type="checkbox" id="slot-select-2"> Select</label>
-    <label><input type="checkbox" id="slot-amber-2"> Amber</label>
+    
   </div>
   <div class="preview">
     <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
@@ -262,7 +263,7 @@ loadCases();
   <div style="display:flex;justify-content:space-between">
     <strong>View 4</strong>
     <label><input type="checkbox" id="slot-select-3"> Select</label>
-    <label><input type="checkbox" id="slot-amber-3"> Amber</label>
+    
   </div>
    <div class="preview">
     <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
@@ -278,7 +279,7 @@ loadCases();
   <div style="display:flex;justify-content:space-between">
     <strong>View 5</strong>
     <label><input type="checkbox" id="slot-select-4"> Select</label>
-    <label><input type="checkbox" id="slot-amber-4"> Amber</label>
+    
   </div>
    <div class="preview">
     <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
@@ -294,7 +295,7 @@ loadCases();
   <div style="display:flex;justify-content:space-between">
     <strong>View 6</strong>
     <label><input type="checkbox" id="slot-select-5"> Select</label>
-    <label><input type="checkbox" id="slot-amber-5"> Amber</label>
+    
   </div>
   <div class="preview">
     <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
@@ -310,7 +311,7 @@ loadCases();
   <div style="display:flex;justify-content:space-between">
     <strong>View 7</strong>
     <label><input type="checkbox" id="slot-select-6"> Select</label>
-    <label><input type="checkbox" id="slot-amber-6"> Amber</label>
+    
   </div>
    <div class="preview">
     <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
@@ -326,7 +327,7 @@ loadCases();
   <div style="display:flex;justify-content:space-between">
     <strong>View 8</strong>
     <label><input type="checkbox" id="slot-select-7"> Select</label>
-    <label><input type="checkbox" id="slot-amber-7"> Amber</label>
+   
   </div>
   <div class="preview">
     <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
@@ -342,7 +343,7 @@ loadCases();
   <div style="display:flex;justify-content:space-between">
     <strong>View 9</strong>
     <label><input type="checkbox" id="slot-select-8"> Select</label>
-    <label><input type="checkbox" id="slot-amber-8"> Amber</label>
+    
   </div>
   <div class="preview">
     <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
@@ -358,7 +359,7 @@ loadCases();
   <div style="display:flex;justify-content:space-between">
     <strong>View 10</strong>
     <label><input type="checkbox" id="slot-select-9"> Select</label>
-    <label><input type="checkbox" id="slot-amber-9"> Amber</label>
+   
   </div>
  <div class="preview">
     <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
@@ -396,6 +397,16 @@ loadCases();
         <textarea id="advise" rows="3"></textarea>
       </div>
     </div>
+    <div class="form-row">
+  <label for="riskIndex">Risk Index</label>
+  <input
+    type="text"
+    id="riskIndex"
+    placeholder="Auto calculated"
+    readonly
+  />
+</div>
+
 
    <div class="row actions">
   <button id="analyzeBtn" class="btn btn-primary">Analyze Selected Images</button>
@@ -403,7 +414,7 @@ loadCases();
  
   <button id="saveBtn" class="btn btn-primary">Save (Auth required)</button>
   <button id="clearBtn" class="btn btn-ghost">Reset Form</button>
-  <button id="pdfBtn" class="btn btn-primary" style="display:none;">Export PDF</button>
+  <button id="pdfBtn" class="btn btn-primary">Export PDF</button>
   <div class="status small" id="status"></div>
 </div>
 
@@ -425,15 +436,17 @@ loadCases();
 
 
 <!-- App modules -->
- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.16.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.16.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.16.0/dist/tf-backend-wasm.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-  console.log("jsPDF test:", window.jspdf);
-</script>
-<script type="module" src="firebase.js"></script>
-<script type="module" src="script.js"></script>
-<script type="module" src="script_case.js"></script>
+
+<!-- ALL app scripts must be modules -->
+<script type="module" src="./firebase.js"></script>
+<script type="module" src="./state.js"></script>
+<script type="module" src="./riskIndexStore.js"></script>
+<script type="module" src="./script.js"></script>
+<script type="module" src="./script_case.js"></script>
+
 
 
 
