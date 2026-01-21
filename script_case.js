@@ -135,9 +135,10 @@ async function loadCase(caseId) {
 
     $("name").value        = d.name || "";
     $("caseNumber").value  = d.caseNumber || "";
-    $("caseId").value  = d.caseId || "";
+    $("caseId").value  = caseId || "";
     $("age").value         = d.age || "";
     $("gender").value      = d.gender || "";
+    $("generalHealth").value =d.generalHealth || "";
     $("duration").value    = d.duration || "";
     $("prevVisit").value   = d.previsit || "";
 
@@ -208,10 +209,11 @@ async function saveCase() {
     caseId,
     email: user.email,
     caseNumber: $("caseNumber").value || "",
-    caseId: $("caseId").value || "",
+    
     name: $("name").value || "",
     age: $("age").value || "",
     gender: $("gender").value || "",
+    generalHealth: $("generalHealth").value || "",
     duration: $("duration").value || "",
     previsit: $("prevVisit").value || "",
     ulcer: getCheckedKey("ulcerGroup"),
