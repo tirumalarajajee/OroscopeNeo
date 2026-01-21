@@ -135,6 +135,7 @@ async function loadCase(caseId) {
 
     $("name").value        = d.name || "";
     $("caseNumber").value  = d.caseNumber || "";
+    $("caseId").value  = d.caseId || "";
     $("age").value         = d.age || "";
     $("gender").value      = d.gender || "";
     $("duration").value    = d.duration || "";
@@ -207,6 +208,7 @@ async function saveCase() {
     caseId,
     email: user.email,
     caseNumber: $("caseNumber").value || "",
+    caseId: $("caseId").value || "",
     name: $("name").value || "",
     age: $("age").value || "",
     gender: $("gender").value || "",
