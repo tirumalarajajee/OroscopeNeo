@@ -71,17 +71,26 @@ window.caseRisk = {
 };
 
 
+function normalize(str) {
+  return str.toUpperCase().replace(/\s+/g, " ").trim();
+}
+
 function getDiagnosisCode(text) {
   if (!text) return null;
 
-  // Normalize input: uppercase + trim spaces
-  const normalizedText = text.toUpperCase().replace(/\s+/g, " ").trim();
+  const normalizedText = normalize(text);
 
   for (const [label, code] of DIAGNOSIS_CODE_MAP) {
-    if (normalizedText.includes(label)) {
+    const normalizedLabel = normalize(label);
+
+    if (
+      normalizedText.includes(normalizedLabel) ||
+      normalizedLabel.includes(normalizedText)
+    ) {
       return code;
     }
   }
+
   return null;
 }
 function getRiskBandCode(text) {
@@ -101,6 +110,8 @@ async function computeAndStoreRisk() {
 
   const diagnosisCode = getDiagnosisCode(diagnosisText);
   const riskBand = getRiskBandCode(analysisText);
+  console.log("Diagnosis text:", $("provDiag").value);
+console.log("Diagnosis code:", getDiagnosisCode($("provDiag").value));
 
   if (!diagnosisCode || !riskBand) {
     console.warn("Risk computation skipped");
