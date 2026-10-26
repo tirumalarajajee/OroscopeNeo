@@ -1,71 +1,156 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Oral Exam — Cases</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oral Exam Cases — Dashboard</title>
+    <!-- Bootstrap 5 CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
+        .card { border: 1px solid rgba(0,0,0,.05); box-shadow: 0 4px 6px -1px rgba(0,0,0,.02); border-radius: 12px; }
+        .form-label-header { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #6c757d; }
+        .section-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #6c757d; border-bottom: 1px solid #dee2e6; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <h1>Oral Exam — Cases</h1>
+<body class="py-4 py-md-5">
 
-    <div id="authArea" class="auth">
-      <div id="userInfo" class="small info">Not signed in</div>
-      <div id="authControls">
-        <input id="authEmail" type="text" placeholder="email" class="auth-input">
-        <input id="authPass" type="password" placeholder="password" class="auth-input">
-        <button id="signUpBtn" class="btn btn-ghost">Sign Up</button>
-        <button id="signInBtn" class="btn btn-primary">Sign In</button>
-        <button id="signOutBtn" class="btn btn-ghost" style="display:none">Sign Out</button>
-      </div>
+    <div class="container" style="max-width: 1140px;">
+        
+        <!-- TOP NAVIGATION BAR -->
+        <header class="card p-3 mb-4 bg-white d-flex flex-sm-row flex-column justify-content-between align-items-sm-center align-items-start gap-3">
+            <div class="d-flex align-items-center gap-2">
+                <div class="bg-primary text-white d-flex align-items-center justify-content-center rounded-2 fw-bold" style="width: 36px; height: 36px; font-size: 0.9rem; letter-spacing: -0.05em;">OE</div>
+                <div>
+                    <h1 class="h6 mb-0 fw-bold text-dark">Oral Exam — Cases</h1>
+                    <small class="text-muted" style="font-size: 0.75rem;">Manage cases • quick search • secure sign in</small>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1.5" style="font-size: 0.75rem;">Not signed in</span>
+              
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT GRID -->
+        <div class="row g-4">
+            
+            <!-- LEFT COLUMN: FILTERS & AUTHENTICATION -->
+            <div class="col-lg-4">
+                <div class="d-flex flex-column gap-4">
+
+                     <!-- SIGN IN CARD -->
+                    <section class="card p-4 bg-white">
+                        <h2 class="section-title">Sign In</h2>
+                        
+                        <div class="mb-3">
+                            <input type="email" placeholder="Email" class="form-control form-control-sm rounded-3 py-2">
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" placeholder="Password" class="form-control form-control-sm rounded-3 py-2">
+                        </div>
+
+                        <div class="d-flex gap-2 pt-1">
+                            <button type="button" class="btn btn-light btn-sm border text-dark flex-grow-1 fw-semibold rounded-3 py-2" style="font-size: 0.75rem;">Sign Up</button>
+                            <button type="button" class="btn btn-primary btn-sm flex-grow-1 fw-semibold rounded-3 py-2" style="font-size: 0.75rem;">Sign In</button>
+                        </div>
+
+                        <p class="text-muted fst-italic pt-3 mb-0 border-top mt-3" style="font-size: 0.7rem; line-height: 1.4;">
+                            Enable Email/Password Auth in Firebase console to use authentication. Note: Rules and setup instructions are included in your project ZIP.
+                        </p>
+                    </section>
+                    
+                    <!-- FILTER CARD -->
+                    <section class="card p-4 bg-white">
+                        <h2 class="section-title">Filters</h2>
+                        
+                        <div class="mb-3">
+                            <label class="form-label form-label-header mb-1">Search</label>
+                            <input type="text" placeholder="Name / case id / diagnosis" class="form-control form-control-sm rounded-3 py-2">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label form-label-header mb-1">Gender</label>
+                            <select class="form-select form-select-sm rounded-3 py-2">
+                                <option>(All genders)</option>
+                                <option>Male</option>
+                                <option>Female</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label form-label-header mb-1">Sort</label>
+                            <select class="form-select form-select-sm rounded-3 py-2">
+                                <option>Date (new → old)</option>
+                                <option>Date (old → new)</option>
+                                <option>Name A → Z</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex gap-2 pt-2">
+                            <button type="button" class="btn btn-primary btn-sm flex-grow-1 fw-semibold rounded-3 py-2" style="font-size: 0.75rem;">+ Add New Case</button>
+                            <button type="button" class="btn btn-light btn-sm border text-secondary fw-semibold rounded-3 px-3 py-2" style="font-size: 0.75rem;">Reset</button>
+                        </div>
+                    </section>
+
+                   
+                    
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: CASES WORKSPACE AREA -->
+            <main class="col-lg-8">
+                <div class="d-flex flex-column gap-3">
+                    
+                    <!-- VIEWS AND SUB-CONTROLS TOOLBAR -->
+                    <div class="card p-3 bg-white d-flex flex-sm-row flex-column gap-3 align-items-center justify-content-between">
+                        <div class="w-100" style="max-width: 280px;">
+                            <input type="text" placeholder="Search name / case id / case number / diagnosis..." class="form-control form-control-sm rounded-2 py-1.5" style="font-size: 0.75rem;">
+                        </div>
+                        
+                        <div class="d-flex gap-2 align-items-center w-100 justify-content-sm-end justify-content-between flex-wrap">
+                            <select class="form-select form-select-sm rounded-2 w-auto" style="font-size: 0.75rem;"><option>Male</option><option>(All genders)</option><option>Female</option></select>
+                            <select class="form-select form-select-sm rounded-2 w-auto" style="font-size: 0.75rem;"><option>Date (old → new)</option><option>Date (new → old)</option></select>
+                            
+                            <div class="btn-group btn-group-sm p-0.5 bg-light rounded-2 border" role="group">
+                                <button type="button" class="btn btn-white btn-sm active shadow-sm rounded-2 fw-medium text-dark" style="font-size: 0.75rem;">Cards</button>
+                                <button type="button" class="btn btn-light btn-sm rounded-2 text-secondary" style="font-size: 0.75rem;">Table</button>
+                            </div>
+                            
+                            <button type="button" class="btn btn-primary btn-sm rounded-2 px-3 fw-semibold" style="font-size: 0.75rem;">
+                                + Add Case
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- CASES HUB DATA STREAM BOX -->
+                    <div class="card bg-white overflow-hidden d-flex flex-column border" style="min-height: 400px;">
+                        <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+                            <h3 class="h6 mb-0 text-dark fw-bold text-uppercase tracking-wider" style="font-size: 0.8rem;">Your Cases</h3>
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1">Not signed in</span>
+                        </div>
+                        
+                        <!-- LOCKED SECURE EMPTY STATE AREA -->
+                        <div class="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-center p-5 bg-light-subtle">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-muted mb-3" style="width: 52px; height: 52px; font-size: 1.3rem;">🔒</div>
+                            <h5 class="text-secondary fw-semibold mb-1" style="font-size: 0.95rem;">Sign In to view cases</h5>
+                            <p class="text-muted small mx-auto mb-3" style="max-width: 320px; font-size: 0.8rem;">Authentication is required to stream diagnostic records from your cloud database repository safely.</p>
+                            <button type="button" class="btn btn-dark btn-sm rounded-3 px-4 py-1.5 fw-medium" style="font-size: 0.75rem;">Sign In Now</button>
+                        </div>
+                    </div>
+                    
+                </div>
+            </main>
+            
+        </div>
+
+        <!-- STYLISH METADATA FOOTER -->
+        <footer class="text-center mt-5 text-muted small border-top pt-3">
+            &copy; 2026 Oral Exam UI Version 1.0
+        </footer>
+
     </div>
-
-    <div class="row" style="margin-top:12px; gap:8px;">
-      <button id="addCaseBtn" class="btn btn-primary">+ Add New Case</button>
-      <input id="searchInput" placeholder="Search name / case id / case number / diagnosis" style="flex:1; padding:8px; border-radius:6px; border:1px solid #ddd;">
-    </div>
-
-    <div style="display:flex; gap:8px; margin-top:10px;">
-      <select id="filterGender">
-        <option value="">All genders</option>
-        <option value="M">Male</option>
-        <option value="F">Female</option>
-        <option value="Other">Other</option>
-      </select>
-
-      <select id="sortBy">
-        <option value="date_desc">Date (new → old)</option>
-        <option value="date_asc">Date (old → new)</option>
-        <option value="name_asc">Name A→Z</option>
-        <option value="caseid_asc">CaseId A→Z</option>
-      </select>
-
-    </div>
-
-    <h2 style="margin-top:12px">Your cases</h2>
-    <div id="casesList" class="cases-list">
-      <div class="small">Not signed in</div>
-    </div>
-
-    <div class="note small info" style="margin-top:16px">
-      <strong>Note:</strong> You must enable Email/Password Auth in Firebase console. Rules are included in the ZIP.
-    </div>
-  </div>
-
-<!-- Firebase Core -->
-
-
-
-<!-- Your Firebase Config -->
-<script type="module" src="./firebase.js"></script>
-<script type="module" src="script_home.js"></script>
-
-
-<!-- Optional -->
-<script src="./libs/html2pdf.bundle.min.js"></script>
-
-
 
 </body>
 </html>
