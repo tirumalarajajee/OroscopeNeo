@@ -1,442 +1,347 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Case Profile</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Profile Dashboard</title>
+    <!-- Bootstrap 5 CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #334155;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .card {
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        }
+        .form-label-header {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+        }
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #1e293b;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .camera-view-container {
+            height: 200px;
+            background-color: #0f172a;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            border-radius: 0.75rem;
+            border: 1px solid #334155;
+        }
+        .slot-card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            padding: 12px;
+            color: #f1f5f9;
+        }
+        .slot-img-placeholder {
+            height: 64px;
+            background-color: #0f172a;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: #475569;
+            font-style: italic;
+            border: 1px solid #1e293b;
+        }
+    </style>
 </head>
+<body class="py-4 py-md-5">
 
-  <div class="container">
-    <h1>Case Profile</h1>
-    <div class="row actions">
-     
+    <div class="container" style="max-width: 1140px;">
+        <div class="card bg-white overflow-hidden">
+            
+            <!-- Header Banner Section -->
+            <div class="p-4 bg-light border-bottom d-flex flex-sm-row flex-column justify-content-between align-items-sm-center align-items-start gap-3">
+                <div>
+                    <h1 class="h3 fw-bold text-dark mb-0">Case Profile</h1>
+                    <p class="text-muted mb-0 small">Clinical oral assessment mapping and diagnostic logger</p>
+                </div>
+                <div class="form-check bg-white p-2 px-3 rounded-3 border shadow-sm">
+                    <input class="form-check-input ms-0 me-2" type="checkbox" id="showDebugOverlay">
+                    <label class="form-check-label text-secondary small fw-medium" for="showDebugOverlay" style="cursor: pointer;">Show debug overlay</label>
+                </div>
+            </div>
+
+            <form class="p-4">
+                
+                <!-- SECTION 1: Patient Demographics -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label form-label-header mb-1">Patient Name</label>
+                        <input type="text" class="form-control rounded-3 py-2" placeholder="Patient name">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label form-label-header mb-1">Case Number</label>
+                        <input type="text" class="form-control rounded-3 py-2" placeholder="Case #">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label form-label-header mb-1">Case ID</label>
+                        <input type="text" class="form-control rounded-3 py-2" placeholder="Unique case ID">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label form-label-header mb-1">Age</label>
+                        <input type="text" class="form-control rounded-3 py-2" placeholder="Age">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label form-label-header mb-1">Gender</label>
+                        <select class="form-select rounded-3 py-2">
+                            <option selected>Select Gender</option>
+                            <option value="M">Male (M)</option>
+                            <option value="F">Female (F)</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label form-label-header mb-1">Patient ID</label>
+                        <input type="text" class="form-control rounded-3 py-2" placeholder="Patient ID">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label form-label-header mb-1">General Health</label>
+                        <textarea rows="2" class="form-control rounded-3 py-2" placeholder="General health notes..."></textarea>
+                    </div>
+                </div>
+
+                <hr class="text-black-50 my-4">
+
+                <!-- SECTION 2: Clinical Observations Matrices -->
+                <div class="row g-4 mb-4">
+                    
+                    <!-- Ulcer Category -->
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3 bg-light border h-100">
+                            <h3 class="section-title">Ulcer</h3>
+                            <div class="row g-2 small mb-3">
+                                <div class="col-sm-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="u1"><label class="form-check-label" for="u1">Round Ulcer</label></div></div>
+                                <div class="col-sm-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="u2"><label class="form-check-label" for="u2">Irregular &lt;1cm &lt;2 Weeks</label></div></div>
+                                <div class="col-sm-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="u3"><label class="form-check-label" for="u3">Irregular &lt;1cm &gt;2 Weeks</label></div></div>
+                                <div class="col-sm-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="u4"><label class="form-check-label" for="u4">Irregular &gt;1cm &lt;2 Weeks</label></div></div>
+                                <div class="col-sm-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="u5"><label class="form-check-label" for="u5">Irregular &gt;1cm &gt;2 Weeks</label></div></div>
+                                <div class="col-sm-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="unad"><label class="form-check-label text-success fw-bold" for="unad">NAD</label></div></div>
+                            </div>
+                            <div>
+                                <label class="form-label form-label-header mb-1" style="font-size: 0.7rem;">Duration (since)</label>
+                                <input type="text" placeholder="no. of days/weeks/months/years" class="form-control form-control-sm rounded-2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Patch Category -->
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3 bg-light border h-100">
+                            <h3 class="section-title">Patch</h3>
+                            <div class="d-flex flex-column gap-2 small">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="p1"><label class="form-check-label" for="p1">Red Patch</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="p2"><label class="form-check-label" for="p2">White Patch</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="p3"><label class="form-check-label" for="p3">Red & White Patch</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="p4"><label class="form-check-label" for="p4">Red patch with white lines</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="pnad"><label class="form-check-label text-success fw-bold" for="pnad">NAD</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Growth Category -->
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3 bg-light border h-100">
+                            <h3 class="section-title">Growth</h3>
+                            <div class="d-flex flex-column gap-2 small">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="g1"><label class="form-check-label" for="g1">Round Growth</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="g2"><label class="form-check-label" for="g2">Irregular &lt;1cm</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="g3"><label class="form-check-label" for="g3">Irregular &gt;1cm</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="gnad"><label class="form-check-label text-success fw-bold" for="gnad">NAD</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mucosal Condition & Pigmentation Box Complex -->
+                    <div class="col-md-6">
+                        <div class="row g-3 h-100">
+                            <div class="col-sm-6">
+                                <div class="p-3 rounded-3 bg-light border h-100">
+                                    <h3 class="section-title">Mucosal Condition</h3>
+                                    <div class="form-check mb-1"><input class="form-check-input" type="checkbox" id="m1"><label class="form-check-label small" for="m1">Marble Appearance</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="mnad"><label class="form-check-label text-success small fw-bold" for="mnad">NAD</label></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="p-3 rounded-3 bg-light border h-100">
+                                    <h3 class="section-title">Pigmentation</h3>
+                                    <div class="form-check mb-1"><input class="form-check-input" type="checkbox" id="pig1"><label class="form-check-label small" for="pig1">Dark Pigmentation</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="pignad"><label class="form-check-label text-success small fw-bold" for="pignad">NAD</label></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Symptoms -->
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3 bg-light border h-100">
+                            <h3 class="section-title">Symptoms</h3>
+                            <div class="row g-2 small">
+                                <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="s1"><label class="form-check-label" for="s1">Pain</label></div></div>
+                                <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="s2"><label class="form-check-label" for="s2">Redness</label></div></div>
+                                <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="s3"><label class="form-check-label" for="s3">Swelling</label></div></div>
+                                <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="s4"><label class="form-check-label" for="s4">Burning</label></div></div>
+                                <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="s5"><label class="form-check-label" for="s5">Difficulty in Eating</label></div></div>
+                                <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="s6"><label class="form-check-label" for="s6">Blanching</label></div></div>
+                                <div class="col-12 border-top pt-2 mt-2"><div class="form-check"><input class="form-check-input" type="checkbox" id="snad"><label class="form-check-label text-success fw-bold" for="snad">No Symptoms</label></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Habits & Sharp Objects Box -->
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3 bg-light border h-100">
+                            <h3 class="section-title">Habits & Sharp Objects</h3>
+                            <div class="row g-2 small mb-3">
+                                <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="h1"><label class="form-check-label" for="h1">Multiple habits</label></div></div>
+                                <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="h2"><label class="form-check-label" for="h2">Smoking</label></div></div>
+                                <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="h3"><label class="form-check-label" for="h3">Alcohol</label></div></div>
+                                <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="h4"><label class="form-check-label" for="h4">Pan Chewing</label></div></div>
+                                <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="h5"><label class="form-check-label" for="h5">Tobacco Chewing</label></div></div>
+                                <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="h6"><label class="form-check-label" for="h6">Spicy Foods</label></div></div>
+                                <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="hnad"><label class="form-check-label text-success fw-bold" for="hnad">No Habits</label></div></div>
+                            </div>
+                            <div class="pt-2 border-top small">
+                                <label class="form-label-header d-block mb-1 text-secondary">Sharp Objects</label>
+                                <div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="so" id="so1"><label class="form-check-label" for="so1">Detected</label></div>
+                                <div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="so" id="so2"><label class="form-check-label" for="so2">Not detected</label></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="text-black-50 my-4">
+
+                <!-- SECTION 3: Clinical History & Mapping Viewport -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <h3 class="section-title">History of Present Illness</h3>
+                        <div class="d-flex gap-3 small mb-2">
+                            <div class="form-check"><input class="form-check-input" type="radio" name="hpi" id="hpi1"><label class="form-check-label" for="hpi1">Yes</label></div>
+                            <div class="form-check"><input class="form-check-input" type="radio" name="hpi" id="hpi2"><label class="form-check-label" for="hpi2">No</label></div>
+                        </div>
+                        <textarea rows="3" placeholder="Your description of previous visit..." class="form-control rounded-3 text-sm"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <h3 class="section-title">Oral Mapping</h3>
+                        <div class="p-3 border rounded-3 bg-light text-center d-flex flex-column align-items-center justify-content-center" style="min-height: 105px;">
+                            <span class="form-label-header text-muted mb-1">Lesion Location</span>
+                            <small class="text-secondary fst-italic">Selected regions will appear here dynamically</small>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="text-black-50 my-4">
+
+                <!-- SECTION 4: Camera & Capture Hub System -->
+                <div class="p-4 rounded-3 bg-dark text-white mb-4">
+                    <div class="d-flex flex-sm-row flex-column justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
+                        <div>
+                            <h3 class="h6 mb-0 text-white fw-bold text-uppercase tracking-wider">Camera & Capture Hub</h3>
+                            <small class="text-secondary">Stream feeds and capture active lesion angles</small>
+                        </div>
+                        <div class="d-flex gap-1">
+                            <button type="button" class="btn btn-sm btn-outline-secondary text-white-50 border-secondary px-3">Refresh</button>
+                            <button type="button" class="btn btn-sm btn-success px-3">Start</button>
+                            <button type="button" class="btn btn-sm btn-danger px-3">Stop</button>
+                        </div>
+                    </div>
+
+                    <!-- Main View Stream Container -->
+                    <div class="camera-view-container mb-4">Camera View Stream Container</div>
+
+                    <!-- 10 View Slots Responsive Grid -->
+                    <div>
+                        <h4 class="form-label-header text-secondary mb-3" style="font-size: 0.7rem;">Image Slots (10)</h4>
+                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
+                            <script>
+                                for(let i=1; i<=10; i++) {
+                                    document.write(`
+                                        <div class="col">
+                                            <div class="slot-card d-flex flex-column justify-content-between gap-2">
+                                                <div class="d-flex justify-content-between align-items-center w-100">
+                                                    <span class="small fw-bold text-white-50">View ${i}</span>
+                                                    <div class="d-flex align-items-center gap-2" style="font-size: 0.65rem;">
+                                                        <div class="form-check mb-0"><input class="form-check-input" type="checkbox" style="transform:scale(0.8);"><label class="form-check-label text-white">Sel</label></div>
+                                                        <div class="form-check mb-0 text-warning"><input class="form-check-input" type="checkbox" style="transform:scale(0.8);"><label class="form-check-label text-warning">Amb</label></div>
+                                                    </div>
+                                                </div>
+                                                <div class="slot-img-placeholder">No image</div>
+                                                <div class="mt-1">
+                                                    <input type="file" class="form-control form-control-sm bg-dark text-white border-secondary mb-1.5" style="font-size: 0.65rem;">
+                                                    <div class="row g-1">
+                                                        <div class="col-6"><button type="button" class="btn btn-secondary btn-sm w-100 py-0.5 text-white fw-medium" style="font-size: 0.65rem;">Capture</button></div>
+                                                        <div class="col-6"><button type="button" class="btn btn-outline-danger btn-sm w-100 py-0.5 fw-medium" style="font-size: 0.65rem;">Remove</button></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `);
+                                }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="text-black-50 my-4">
+
+                <!-- SECTION 5: Image Analysis & Clinical Output -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                        <h3 class="h6 mb-0 text-dark fw-bold text-uppercase tracking-wider">Image Analysis & Diagnostics</h3>
+                        <button type="button" class="btn btn-outline-primary btn-sm rounded-3 px-3 fw-semibold">Analyze Selected Images</button>
+                    </div>
+                    <div class="p-3 border rounded-3 bg-light text-muted small fst-italic mb-3">No analysis run yet. Check slots and trigger above.</div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label form-label-header mb-1">Provisional Diagnosis</label>
+                            <input type="text" class="form-control form-control-sm rounded-2 py-2" placeholder="Provisional Diagnosis">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label form-label-header mb-1">Differential Diagnosis</label>
+                            <input type="text" class="form-control form-control-sm rounded-2 py-2" placeholder="Differential Diagnosis">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label form-label-header mb-1">Advise</label>
+                            <input type="text" class="form-control form-control-sm rounded-2 py-2" placeholder="Advise">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Action Toolbar Controls -->
+                <div class="pt-3 mt-4 border-top d-flex flex-sm-row flex-column justify-content-between align-items-center gap-3">
+                    <p class="text-muted mb-0" style="font-size: 0.75rem;">Security note: Configure Firebase Storage & Firestore rules to require authentication (request.auth != null). <span class="fw-bold text-secondary">Waiting…</span></p>
+                    <div class="d-flex gap-2 w-100 justify-content-sm-end">
+                        <button type="reset" class="btn btn-light border text-dark px-4 py-2 fw-semibold rounded-3">Reset Form</button>
+                        <button type="submit" class="btn btn-success px-4 py-2 fw-semibold rounded-3 shadow-sm" onclick="event.preventDefault();">Save (Auth required)</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
     </div>
-    <div id="casesList" style="margin-top:12px"></div>
-  </div>
-
-
-<script type="module">
-import { db } from './firebase.js';
-import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-function $(id){ return document.getElementById(id); }
-
-const newCaseBtn = $('newCase');
-if (newCaseBtn) {
-  newCaseBtn.addEventListener('click', () => {
-    location.href = 'index.html';
-  });
-}
-
-
-async function loadCases(){
-  const list = $('casesList');
-  list.innerHTML = 'Loading...';
-  try {
-    const q = query(collection(db, 'cases'), orderBy('timestamp','desc'));
-    const snap = await getDocs(q);
-    if(snap.empty){ list.innerHTML='<div class="small">No cases</div>'; return; }
-    const rows = [];
-    snap.forEach(doc=>{
-      const d=doc.data();
-      rows.push(`<div class="info" style="margin-bottom:8px;padding:8px">
-        <strong>${d.name||'--'}</strong> — ${d.caseNumber||'--'}<br/>
-        Age: ${d.age||'--'} | Gender: ${d.gender||'--'}<br/>
-        Provisional: ${d.provisionalDiagnosis||''}<br/>
-        <button onclick="viewCase('${doc.id}')" class="btn btn-ghost">View / Edit</button>
-      </div>`);
-    });
-    list.innerHTML = rows.join('\\n');
-  } catch(e){
-    list.innerHTML = 'Error loading';
-    console.error(e);
-  }
-}
-window.viewCase = function(id){ location.href = 'index.html?id=' + encodeURIComponent(id); }
-loadCases();
-</script>
-</body>
-
-
-
-    
-
-   <div class="layout">
-  <div class="main">
-    <div class="grid cols-2">
-      <div><label>Name</label><input id="name" type="text" placeholder="Patient name"></div>
-      <div><label>Case Number</label><input id="caseNumber" type="text" placeholder="Case #"></div>
-      <div><label>Case ID</label><input id="caseId" type="text" placeholder="Unique case ID"></div>
-      <div><label>Age</label><input id="age" type="number" placeholder="Age"></div>
-      <div><label>Gender</label><input id="gender" type="text" placeholder="M / F / Other"></div>
-      <div><label>Patient ID</label><input id="pid" type="text" placeholder="Patient ID"></div>
-      <div><label>General Health</label><input id="generalHealth" type="text" placeholder="General health notes"></div>
-      <label><input type="checkbox" id="debugToggle"> Show debug overlay</label>
-      
-
-      <!-- Duration removed from here -->
-    </div>
-
-    <hr>
-
-       <h3>ULCER</h3>
-<div class="checkbox-row" id="ulcerGroup">
-  <label><input type="checkbox" data-key="Round Ulcer"> Round Ulcer</label>
-  <label><input type="checkbox" data-key="Irregular <1cm, <2 Weeks"> Irregular &lt;1cm &lt;2 Weeks</label>
-  <label><input type="checkbox" data-key="Irregular <1cm, >2 Weeks"> Irregular &lt;1cm &gt;2 Weeks</label>
-  <label><input type="checkbox" data-key="Irregular >1cm, <2 Weeks"> Irregular &gt;1cm &lt;2 Weeks</label>
-  <label><input type="checkbox" data-key="Irregular >1cm, >2 Weeks"> Irregular &gt;1cm &gt;2 Weeks</label>
-  <label><input type="checkbox" data-key="No Abnormality Detected"> NAD</label>
-</div>
-
-
-    <!-- Duration moved here -->
-    <div>
-      <label>Duration (since)</label>
-      <input id="duration" type="text" placeholder="no. of days/weeks/months/years">
-    </div>
-
-    <h3>Patch</h3>
-<div class="checkbox-row" id="patchGroup">
-  <label><input type="checkbox" data-key="Red Patch"> Red Patch</label>
-  <label><input type="checkbox" data-key="White Patch"> White Patch</label>
-  <label><input type="checkbox" data-key="Red & White Patch"> Red & White Patch</label>
-  <label><input type="checkbox" data-key="Red patch with whitelines"> Red patch with white lines</label>
-  <label><input type="checkbox" data-key="No Abnormality Detected"> NAD</label>
-</div>
-
-
- <h3>Growth</h3>
-<div class="checkbox-row" id="growthGroup">
-  <label><input type="checkbox" data-key="Round Growth"> Round Growth</label>
-  <label><input type="checkbox" data-key="Irregular Growth <1cm"> Irregular &lt;1cm</label>
-  <label><input type="checkbox" data-key="Irregular Growth >1cm"> Irregular &gt;1cm</label>
-  <label><input type="checkbox" data-key="No Abnormality Detected"> NAD</label>
-</div>
-
-<h3>Mucosal Condition</h3>
-<div class="checkbox-row" id="mucosaGroup">
-  <label><input type="checkbox" data-key="Marble Appearance"> Marble Appearance</label>
-  <label><input type="checkbox" data-key="No Abnormality Detected"> NAD</label>
-</div>
-
-
-
-        <h3>Pigmentation</h3>
-<div class="checkbox-row" id="pigmentationGroup">
-  <label><input type="checkbox" data-key="Dark Pigmentation"> Dark Pigmentation</label>
-  <label><input type="checkbox" data-key="No Abnormality Detected"> NAD</label>
-</div>
-
-
-        
-
-        <h3>Symptoms</h3>
-<div class="checkbox-row" id="symptomGroup">
-  <label><input type="checkbox" data-key="Pain"> Pain</label>
-  <label><input type="checkbox" data-key="Redness"> Redness</label>
-  <label><input type="checkbox" data-key="Swelling"> Swelling</label>
-  <label><input type="checkbox" data-key="Burning"> Burning</label>
-  <label><input type="checkbox" data-key="Difficulty in Eating"> Difficulty in Eating</label>
-  <label><input type="checkbox" data-key="Blanching"> Blanching</label>
-  <label><input type="checkbox" data-key="No Symptoms"> No Symptoms</label>
-</div>
-
-
-        <h3>Habits</h3>
-<div class="checkbox-row" id="habitGroup">
-  <label><input type="checkbox" data-key="Multiple habits"> Multiple habits</label>
-  <label><input type="checkbox" data-key="Smoking"> Smoking</label>
-  <label><input type="checkbox" data-key="Alcohol"> Alcohol</label>
-  <label><input type="checkbox" data-key="Pan Chewing"> Pan Chewing</label>
-  <label><input type="checkbox" data-key="Tobacco Chewing"> Tobacco Chewing</label>
-  <label><input type="checkbox" data-key="Spicy Foods"> Spicy Foods</label>
-  <label><input type="checkbox" data-key="No Habits"> No Habits</label>
-</div>
-
-
-       <h3>Sharp Objects</h3>
-<div class="checkbox-row" id="teethGroup">
-  <label><input type="checkbox" data-key="Detected"> Detected</label>
-  <label><input type="checkbox" data-key="Not detected"> Not detected</label>
-</div>
-
-       
-      <h3>History of Present Illness</h3>
-    <div class="checkbox-row" id="illnessGroup">
-      <label><input type="checkbox" data-key="histYes"> Yes</label>
-      <label><input type="checkbox" data-key="histNo"> No</label>
-    </div>
-    <label>Your description of previous visit</label>
-    <textarea id="prevVisit" rows="3" placeholder="your description of previous visit"></textarea>
-
-
-
-
-    <!-- 🔽 Oral Mapping moved here -->
-    <div class="mapping-wrap" style="position:relative; display:inline-block;">
-<img
-  id="mapImage"
-  class="mapping-img"
-  src="oralcavitycolornew3.jpeg"
-  alt="oral mapping"
-  style="display:block; max-width:100%;"
-/><canvas id="mapCanvas" class="mapping-canvas" style="position:absolute; left:0; top:0;"></canvas>
-</div>
-
-<label>Lesion Location</label>
-<input id="lesionLocation" type="text" placeholder="Selected regions will appear here">
-
-
-
-    <!-- 🔽 Camera moved here -->
-    <hr>
-    <h3>Camera & Capture</h3>
-    <div class="row">
-      <select id="cameraSelect"></select>
-      <button id="refreshCams" class="btn btn-ghost">Refresh</button>
-    </div>
-    <video id="cameraPreview" class="camera-video" autoplay muted playsinline></video>
-    <div class="row">
-      <button id="startCam" class="btn btn-primary">Start</button>
-      <button id="stopCam" class="btn btn-ghost">Stop</button>
-    </div>
-
-  </div> <!-- end .main -->
-    </div>
-
-    <hr>
-
-    <h3>Image Slots (10)</h3>
-    <div id="slotsContainer" class="slot-grid">
-<div class="slot">
-  <div style="display:flex;justify-content:space-between">
-    <strong>View 1</strong>
-    <label><input type="checkbox" id="slot-select-0"> Select</label>
-    <label><input type="checkbox" id="slot-amber-0"> Amber</label>
-  </div>
-   <div class="preview">
-    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
-    <div class="small">No image</div>
-  </div>
-  <input type="file" accept="image/*">
-  <div style="display:flex;gap:6px">
-    <button class="btn btn-ghost" onclick="captureToSlot(0)">Capture</button>
-    <button class="btn btn-ghost">Remove</button>
-  </div>
-</div>
-<div class="slot">
-  <div style="display:flex;justify-content:space-between">
-    <strong>View 2</strong>
-    <label><input type="checkbox" id="slot-select-1"> Select</label>
-    <label><input type="checkbox" id="slot-amber-1"> Amber</label>
-  </div>
-   <div class="preview">
-    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
-    <div class="small">No image</div>
-  </div>
-  <input type="file" accept="image/*">
-  <div style="display:flex;gap:6px">
-    <button class="btn btn-ghost">Capture</button>
-    <button class="btn btn-ghost">Remove</button>
-  </div>
-</div>
-<div class="slot">
-  <div style="display:flex;justify-content:space-between">
-    <strong>View 3</strong>
-    <label><input type="checkbox" id="slot-select-2"> Select</label>
-    <label><input type="checkbox" id="slot-amber-2"> Amber</label>
-  </div>
-  <div class="preview">
-    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
-    <div class="small">No image</div>
-  </div>
-  <input type="file" accept="image/*">
-  <div style="display:flex;gap:6px">
-    <button class="btn btn-ghost">Capture</button>
-    <button class="btn btn-ghost">Remove</button>
-  </div>
-</div>
-<div class="slot">
-  <div style="display:flex;justify-content:space-between">
-    <strong>View 4</strong>
-    <label><input type="checkbox" id="slot-select-3"> Select</label>
-    <label><input type="checkbox" id="slot-amber-3"> Amber</label>
-  </div>
-   <div class="preview">
-    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
-    <div class="small">No image</div>
-  </div>
-  <input type="file" accept="image/*">
-  <div style="display:flex;gap:6px">
-    <button class="btn btn-ghost">Capture</button>
-    <button class="btn btn-ghost">Remove</button>
-  </div>
-</div>
-<div class="slot">
-  <div style="display:flex;justify-content:space-between">
-    <strong>View 5</strong>
-    <label><input type="checkbox" id="slot-select-4"> Select</label>
-    <label><input type="checkbox" id="slot-amber-4"> Amber</label>
-  </div>
-   <div class="preview">
-    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
-    <div class="small">No image</div>
-  </div>
-  <input type="file" accept="image/*">
-  <div style="display:flex;gap:6px">
-    <button class="btn btn-ghost">Capture</button>
-    <button class="btn btn-ghost">Remove</button>
-  </div>
-</div>
-<div class="slot">
-  <div style="display:flex;justify-content:space-between">
-    <strong>View 6</strong>
-    <label><input type="checkbox" id="slot-select-5"> Select</label>
-    <label><input type="checkbox" id="slot-amber-5"> Amber</label>
-  </div>
-  <div class="preview">
-    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
-    <div class="small">No image</div>
-  </div>
-  <input type="file" accept="image/*">
-  <div style="display:flex;gap:6px">
-    <button class="btn btn-ghost">Capture</button>
-    <button class="btn btn-ghost">Remove</button>
-  </div>
-</div>
-<div class="slot">
-  <div style="display:flex;justify-content:space-between">
-    <strong>View 7</strong>
-    <label><input type="checkbox" id="slot-select-6"> Select</label>
-    <label><input type="checkbox" id="slot-amber-6"> Amber</label>
-  </div>
-   <div class="preview">
-    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
-    <div class="small">No image</div>
-  </div>
-  <input type="file" accept="image/*">
-  <div style="display:flex;gap:6px">
-    <button class="btn btn-ghost">Capture</button>
-    <button class="btn btn-ghost">Remove</button>
-  </div>
-</div>
-<div class="slot">
-  <div style="display:flex;justify-content:space-between">
-    <strong>View 8</strong>
-    <label><input type="checkbox" id="slot-select-7"> Select</label>
-    <label><input type="checkbox" id="slot-amber-7"> Amber</label>
-  </div>
-  <div class="preview">
-    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
-    <div class="small">No image</div>
-  </div>
-  <input type="file" accept="image/*">
-  <div style="display:flex;gap:6px">
-    <button class="btn btn-ghost">Capture</button>
-    <button class="btn btn-ghost">Remove</button>
-  </div>
-</div>
-<div class="slot">
-  <div style="display:flex;justify-content:space-between">
-    <strong>View 9</strong>
-    <label><input type="checkbox" id="slot-select-8"> Select</label>
-    <label><input type="checkbox" id="slot-amber-8"> Amber</label>
-  </div>
-  <div class="preview">
-    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
-    <div class="small">No image</div>
-  </div>
-  <input type="file" accept="image/*">
-  <div style="display:flex;gap:6px">
-    <button class="btn btn-ghost">Capture</button>
-    <button class="btn btn-ghost">Remove</button>
-  </div>
-</div>
-<div class="slot">
-  <div style="display:flex;justify-content:space-between">
-    <strong>View 10</strong>
-    <label><input type="checkbox" id="slot-select-9"> Select</label>
-    <label><input type="checkbox" id="slot-amber-9"> Amber</label>
-  </div>
- <div class="preview">
-    <img class="slot-image" src="" alt="Preview" style="max-width:100%;display:none;">
-    <div class="small">No image</div>
-  </div>
-  <input type="file" accept="image/*">
-  <div style="display:flex;gap:6px">
-    <button class="btn btn-ghost">Capture</button>
-    <button class="btn btn-ghost">Remove</button>
-  </div>
-</div>
-
-
-
-
-
-</div>
-
-    <div>
-      <h3>Image Analysis</h3>
-      <pre id="analysis">No analysis yet.</pre>
-    </div>
-
-    <div class="grid cols-3 diag-grid">
-      <div>
-        <label>Provisional Diagnosis</label>
-        <textarea id="provDiag" rows="3"></textarea>
-      </div>
-      <div>
-        <label>Differential Diagnosis</label>
-        <textarea id="diffDiag" rows="3"></textarea>
-      </div>
-      <div>
-        <label>Advise</label>
-        <textarea id="advise" rows="3"></textarea>
-      </div>
-    </div>
-
-   <div class="row actions">
-  <button id="analyzeBtn" class="btn btn-primary">Analyze Selected Images</button>
-  <!-- New Image Analysis button -->
- 
-  <button id="saveBtn" class="btn btn-primary">Save (Auth required)</button>
-  <button id="clearBtn" class="btn btn-ghost">Reset Form</button>
-  <div class="status small" id="status"></div>
-</div>
-
-
-    <div class="note small info">
-      <strong>Security note:</strong> Configure Firebase Storage & Firestore rules to require authentication (request.auth != null).
-    </div>
-  </div>
-
-  <div id="livePrediction" class="prediction-overlay">
-  Waiting…
-</div>
-
-
-<!-- TensorFlow -->
-
-
-<!-- html2pdf -->
-
-
-<!-- App modules -->
- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.16.0/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.16.0/dist/tf-backend-wasm.min.js"></script>
-
-<script type="module" src="firebase.js"></script>
-<script type="module" src="script.js"></script>
-<script type="module" src="script_case.js"></script>
-
-
-
-
-
-
-
 
 </body>
 </html>
